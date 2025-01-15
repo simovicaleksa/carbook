@@ -1,9 +1,11 @@
 import { Loader2 } from "lucide-react";
-import { Button, type ButtonProps } from "./button";
+
 import { cn } from "~/lib/utils";
 
+import { Button, type ButtonProps } from "./button";
+
 type LoadingButtonProps = {
-  isLoading?: boolean;
+  isLoading: boolean;
   loadingText?: string;
 } & ButtonProps;
 
@@ -18,7 +20,7 @@ export default function LoadingButton(props: LoadingButtonProps) {
       disabled={isDisabled}
       className={cn("flex flex-row items-center gap-2", className)}
     >
-      <Loader2 className="size-4" />
+      {isLoading && <Loader2 className="size-4 animate-spin" />}
       {isLoading && loadingText?.length ? loadingText : children}
     </Button>
   );

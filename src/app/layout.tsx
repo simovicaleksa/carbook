@@ -1,10 +1,11 @@
-import "~/styles/globals.css";
-
-import { GeistSans } from "geist/font/sans";
 import { type Metadata } from "next";
 
+import { GeistSans } from "geist/font/sans";
+
+import "~/styles/globals.css";
+
 export const metadata: Metadata = {
-  title: "Carbook",
+  title: "CarBook",
   description: "Powered by Next.js",
   // icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
