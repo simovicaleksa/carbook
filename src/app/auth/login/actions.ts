@@ -9,15 +9,26 @@ import {
   generateSessionToken,
   setSessionTokenCookie,
 } from "~/lib/server/auth";
-import { createUser } from "~/lib/server/user";
+import { getUserFromUsernameOrEmail } from "~/lib/server/user";
 
-import { signupSchema } from "./validators";
+import { loginSchema } from "./validators";
 
-export async function signUp(signupUser: z.infer<typeof signupSchema>) {
+export async function login({
+  username,
+  password,
+}: z.infer<typeof loginSchema>) {
   try {
-    const parsedUser = signupSchema.parse(signupUser);
+    const parsedUser = loginSchema.parse({ username, password });
 
-    const user = await createUser(parsedUser);
+    const user = await getUserFromUsernameOrEmail(parsedUser.username);
+
+    if (!user) {
+      return {
+        ok: false,
+        status: 401,
+        error: new Error("Invalid username or password"),
+      };
+    }
 
     const sessionToken = generateSessionToken();
     const session = await createSession(sessionToken, user.id);
@@ -38,5 +49,5 @@ export async function signUp(signupUser: z.infer<typeof signupSchema>) {
     };
   }
 
-  redirect("/welcome/signup");
+  return redirect("/welcome/login");
 }

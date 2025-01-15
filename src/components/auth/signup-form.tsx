@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import { type z } from "zod";
 
 import { signUp } from "~/app/auth/signup/actions";
@@ -49,7 +50,11 @@ export default function SignupForm() {
 
     const res = await signUp(values);
 
-    console.log(res);
+    if (res.error) {
+      toast.error(`Error - ${res.status}`, {
+        description: res.error.message,
+      });
+    }
 
     loading.end();
   }

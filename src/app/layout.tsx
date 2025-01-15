@@ -4,6 +4,8 @@ import { GeistSans } from "geist/font/sans";
 
 import "~/styles/globals.css";
 
+import { Toaster } from "~/components/ui/sonner";
+
 export const metadata: Metadata = {
   title: "CarBook",
   description: "Powered by Next.js",
@@ -15,7 +17,18 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <Toaster
+          position="bottom-right"
+          richColors
+          theme="light"
+          duration={3000}
+          visibleToasts={6}
+          closeButton
+          expand
+        />
+      </body>
     </html>
   );
 }

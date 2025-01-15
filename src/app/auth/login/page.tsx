@@ -2,18 +2,18 @@ import { redirect } from "next/navigation";
 
 import { getCurrentSession } from "~/lib/server/auth";
 
-import SignupCard from "~/components/auth/signup-card";
+import LoginCard from "~/components/auth/login-card";
 
-export default async function SignupPage() {
+export default async function LoginPage() {
   const { user } = await getCurrentSession();
 
   if (user) {
-    return redirect("/dashboard");
+    return redirect("/welcome/login");
   }
 
   return (
     <main className="flex min-h-screen items-center justify-center">
-      <SignupCard />
+      <LoginCard />
     </main>
   );
 }
