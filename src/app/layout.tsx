@@ -7,7 +7,7 @@ import "~/styles/globals.css";
 import { Toaster } from "~/components/ui/sonner";
 
 export const metadata: Metadata = {
-  title: "CarBook",
+  title: "Car Book",
   description: "Powered by Next.js",
   // icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
