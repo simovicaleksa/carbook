@@ -9,6 +9,7 @@ import {
   generateSessionToken,
   setSessionTokenCookie,
 } from "~/lib/server/auth";
+import { hashPassword, verifyPasswordHash } from "~/lib/server/password";
 import { getUserFromUsernameOrEmail } from "~/lib/server/user";
 
 import { loginSchema } from "./validators";
@@ -23,6 +24,16 @@ export async function login({
     const user = await getUserFromUsernameOrEmail(parsedUser.username);
 
     if (!user) {
+      return {
+        ok: false,
+        status: 401,
+        error: new Error("Invalid username or password"),
+      };
+    }
+
+    const passwordsMatch = await verifyPasswordHash(user.password, password);
+
+    if (!passwordsMatch) {
       return {
         ok: false,
         status: 401,
