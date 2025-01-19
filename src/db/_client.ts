@@ -18,4 +18,4 @@ const conn =
   postgres(env.POSTGRES_URL, { ssl: env.NODE_ENV === "production" });
 if (env.NODE_ENV !== "production") globalForDb.conn = conn;
 
-export const db = drizzle(conn, { schema, logger: true });
+export const db = drizzle(conn, { schema });
