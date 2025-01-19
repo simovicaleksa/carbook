@@ -2,6 +2,8 @@
 
 import { Car, ChevronsUpDown, Plus } from "lucide-react";
 
+import { useAddVehicleDialog } from "~/context/add-vehicle-dialog-context";
+
 import { useIsMobile } from "~/hooks/use-mobile";
 
 import {
@@ -20,6 +22,7 @@ import {
 
 export default function VehicleSwitcher() {
   const isMobile = useIsMobile();
+  const { toggleOpen } = useAddVehicleDialog();
 
   return (
     <SidebarMenu>
@@ -48,7 +51,7 @@ export default function VehicleSwitcher() {
               Vehicles
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
+            <DropdownMenuItem className="gap-2 p-2" onClick={toggleOpen}>
               <div className="flex size-6 items-center justify-center rounded-md border bg-background">
                 <Plus className="size-4" />
               </div>
