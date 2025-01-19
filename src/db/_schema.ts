@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import {
   boolean,
   integer,
@@ -19,6 +20,7 @@ export const userTable = pgTable("users", {
   role: text("role", { enum: ["user", "mechanic"] })
     .default("user")
     .notNull(),
+  prefersImperial: boolean("prefers_imperial").default(false).notNull(),
   createdAt: timestamp("created_at", {
     mode: "date",
     precision: 3,
@@ -26,14 +28,17 @@ export const userTable = pgTable("users", {
   updatedAt: timestamp("updated_at", { mode: "date", precision: 3 }).$onUpdate(
     () => new Date(),
   ),
-  prefersImperial: boolean("prefers_imperial").default(false).notNull(),
 });
+
+export const userRelations = relations(userTable, ({ many }) => ({
+  vehicles: many(vehicleTable),
+}));
 
 export const sessionTable = pgTable("sessions", {
   id: text("id").primaryKey(),
   userId: uuid("user_id")
     .notNull()
-    .references(() => userTable.id),
+    .references(() => userTable.id, { onDelete: "cascade" }),
   expiresAt: timestamp("expires_at", {
     withTimezone: true,
     mode: "date",
@@ -47,7 +52,25 @@ export const vehicleTable = pgTable("vehicles", {
   model: varchar("model", { length: 255 }).notNull(),
   year: integer("year").notNull(),
   distanceTraveled: integer("distance_traveled").default(0).notNull(),
+  ownerId: uuid("owner_id")
+    .notNull()
+    .references(() => userTable.id, { onDelete: "set null" }),
+  createdAt: timestamp("created_at", {
+    mode: "date",
+    precision: 3,
+  }).defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "date", precision: 3 }).$onUpdate(
+    () => new Date(),
+  ),
 });
+
+export const vehicleRelations = relations(vehicleTable, ({ one, many }) => ({
+  user: one(userTable, {
+    fields: [vehicleTable.ownerId],
+    references: [userTable.id],
+  }),
+  history: many(historyTable),
+}));
 
 export const historyTable = pgTable("history", {
   id: serial("id").primaryKey(),
@@ -70,4 +93,46 @@ export const historyTable = pgTable("history", {
     ],
   }),
   description: text("description").default(""),
+  vehicleId: uuid("vehicle_id")
+    .notNull()
+    .references(() => vehicleTable.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at", {
+    mode: "date",
+    precision: 3,
+  }).defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "date", precision: 3 }).$onUpdate(
+    () => new Date(),
+  ),
 });
+
+export const historyRelations = relations(historyTable, ({ one }) => ({
+  vehicle: one(vehicleTable, {
+    fields: [historyTable.vehicleId],
+    references: [vehicleTable.id],
+  }),
+  cost: one(moneyTable),
+}));
+
+export const moneyTable = pgTable("money", {
+  id: serial("id").primaryKey(),
+  amount: integer("amount"),
+  currency: text("currency").notNull(),
+  historyEntryId: integer("history_entry_id").references(
+    () => historyTable.id,
+    { onDelete: "cascade" },
+  ),
+  createdAt: timestamp("created_at", {
+    mode: "date",
+    precision: 3,
+  }).defaultNow(),
+  updatedAt: timestamp("updated_at", { mode: "date", precision: 3 }).$onUpdate(
+    () => new Date(),
+  ),
+});
+
+export const moneyRelations = relations(moneyTable, ({ one }) => ({
+  historyEntry: one(historyTable, {
+    fields: [moneyTable.historyEntryId],
+    references: [historyTable.id],
+  }),
+}));
