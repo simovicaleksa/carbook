@@ -45,8 +45,10 @@ export default async function WelcomePage() {
           </ul>
         </CardContent>
         <CardFooter>
-          <Button size={"lg"} asChild>
-            <Link href={"/dashboard"}>Go to dashboard</Link>
+          <Button asChild>
+            <Link className="w-full" href={"/dashboard"}>
+              Go to dashboard
+            </Link>
           </Button>
         </CardFooter>
       </Card>

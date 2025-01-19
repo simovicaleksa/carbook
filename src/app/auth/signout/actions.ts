@@ -8,7 +8,7 @@ import {
   invalidateSession,
 } from "~/lib/server/auth";
 
-export async function logout() {
+export async function signout() {
   try {
     const { session } = await getCurrentSession();
 

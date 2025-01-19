@@ -9,7 +9,7 @@ import {
   generateSessionToken,
   setSessionTokenCookie,
 } from "~/lib/server/auth";
-import { hashPassword, verifyPasswordHash } from "~/lib/server/password";
+import { verifyPasswordHash } from "~/lib/server/password";
 import { getUserFromUsernameOrEmail } from "~/lib/server/user";
 
 import { loginSchema } from "./validators";

@@ -40,11 +40,17 @@ export default async function WelcomePage() {
               <span className="font-semibold">Username: </span>
               {user.username}
             </li>
+            <li className="text-sm">
+              <span className="font-semibold">Email: </span>
+              {user.email}
+            </li>
           </ul>
         </CardContent>
         <CardFooter>
-          <Button size={"sm"} asChild>
-            <Link href={"/dashboard"}>Go to dashboard</Link>
+          <Button asChild>
+            <Link className="w-full" href={"/dashboard"}>
+              Go to dashboard
+            </Link>
           </Button>
         </CardFooter>
       </Card>

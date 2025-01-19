@@ -7,6 +7,7 @@ import { db } from "~/db";
 import { userTable } from "~/db/_schema";
 
 import { hashPassword } from "./password";
+import { lower } from "./sql";
 
 export async function createUser(user: z.infer<typeof signupSchema>) {
   const isEmailAvailable = await checkEmailAvailability(user.email);
@@ -67,10 +68,17 @@ export async function checkUsernameAvailability(username: string) {
 }
 
 export async function getUserFromUsernameOrEmail(username: string) {
+  const lowerCaseUsername = username.toLowerCase();
+
   const [user] = await db
     .select()
     .from(userTable)
-    .where(or(eq(userTable.username, username), eq(userTable.email, username)));
+    .where(
+      or(
+        eq(lower(userTable.username), lowerCaseUsername),
+        eq(lower(userTable.email), lowerCaseUsername),
+      ),
+    );
 
   return user;
 }

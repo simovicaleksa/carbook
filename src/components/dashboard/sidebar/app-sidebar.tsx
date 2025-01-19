@@ -1,25 +1,14 @@
 "use client";
 
-import Link from "next/link";
-
 import {
-  CarFront,
-  ChartNoAxesCombined,
-  ChevronUp,
+  ChartLine,
+  ChartNoAxesGantt,
+  Flag,
   Home,
   LifeBuoy,
   Send,
-  User2,
 } from "lucide-react";
 
-import { useUser } from "~/context/user-context";
-
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
 import {
   Sidebar,
   SidebarContent,
@@ -27,10 +16,14 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "../ui/sidebar";
+} from "../../ui/sidebar";
+
+import UserDropdown from "./user-dropdown";
+import VehicleSwitcher from "./vehicle-switcher";
 
 const coreItems = [
   {
@@ -39,14 +32,14 @@ const coreItems = [
     icon: <Home />,
   },
   {
-    title: "Cars",
-    url: "/dashboard/cars",
-    icon: <CarFront />,
+    title: "History",
+    url: "/dashboard/history",
+    icon: <ChartNoAxesGantt />,
   },
   {
     title: "Statistics",
     url: "/dashboard/statistics",
-    icon: <ChartNoAxesCombined />,
+    icon: <ChartLine />,
   },
 ];
 
@@ -61,13 +54,19 @@ const helpItems = [
     url: "/feedback",
     icon: <Send />,
   },
+  {
+    title: "Report issue",
+    url: "/report-issue",
+    icon: <Flag />,
+  },
 ];
 
-export default function DashboardSidebar() {
-  const user = useUser();
-
+export default function AppSidebar() {
   return (
     <Sidebar>
+      <SidebarHeader>
+        <VehicleSwitcher />
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Dashboard</SidebarGroupLabel>
@@ -105,35 +104,7 @@ export default function DashboardSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <SidebarGroup>
-          <SidebarGroupLabel>Account</SidebarGroupLabel>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <SidebarMenuButton>
-                    <User2 className="size-4" />
-                    {`${user.firstName} ${user.lastName}`}
-                    <ChevronUp className="ml-auto" />
-                  </SidebarMenuButton>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  side="top"
-                  className="w-[--radix-popper-anchor-width]"
-                >
-                  <DropdownMenuItem>
-                    <span>Account</span>
-                  </DropdownMenuItem>
-                  <Link href={"/auth/logout"}>
-                    <DropdownMenuItem>
-                      <span>Log out</span>
-                    </DropdownMenuItem>
-                  </Link>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </SidebarMenuItem>
-          </SidebarMenu>
-        </SidebarGroup>
+        <UserDropdown />
       </SidebarFooter>
     </Sidebar>
   );

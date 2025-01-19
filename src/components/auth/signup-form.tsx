@@ -167,13 +167,12 @@ export default function SignupForm() {
         />
         <FormItem className="col-span-full">
           <FormDescription>
-            By clicking &quot;Sign up&quot; button you agree to our{" "}
+            Already have an account?{" "}
             <Link
-              className="underline-offset-2 hover:underline"
-              target="_blank"
-              href={"/legal/terms"}
+              className="text-blue-500 underline-offset-2 hover:underline"
+              href={"/auth/login"}
             >
-              Terms of Service
+              Login
             </Link>
             .
           </FormDescription>
@@ -183,9 +182,23 @@ export default function SignupForm() {
             isLoading={loading.isLoading}
             loadingText="Signing up"
             type="submit"
+            className="w-full"
           >
             Sign up
           </LoadingButton>
+        </FormItem>
+        <FormItem className="col-span-full">
+          <FormDescription className="text-xs">
+            By clicking &quot;Sign up&quot; button you agree to our{" "}
+            <Link
+              className="text-blue-500 underline-offset-2 hover:underline"
+              target="_blank"
+              href={"/legal/terms"}
+            >
+              Terms of Service
+            </Link>
+            .
+          </FormDescription>
         </FormItem>
       </form>
     </Form>

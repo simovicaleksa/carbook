@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 
 import { getCurrentSession } from "~/lib/server/auth";
 
-import LogoutDialog from "~/components/auth/logout-dialog";
+import LogoutDialog from "~/components/auth/signout-dialog";
 import {
   Card,
   CardContent,
@@ -21,8 +21,8 @@ export default async function LogoutPage() {
     <main className="flex min-h-screen items-center justify-center">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Logout</CardTitle>
-          <CardDescription>Are you sure you want to log out?</CardDescription>
+          <CardTitle>Sign out</CardTitle>
+          <CardDescription>Are you sure you want to sign out?</CardDescription>
         </CardHeader>
         <CardContent>
           <ul className="space-y-1">

@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -14,6 +16,7 @@ import { useLoading } from "~/hooks/use-loading";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -77,10 +80,22 @@ export default function LoginForm() {
           )}
         />
         <FormItem className="col-span-full">
+          <FormDescription>
+            Don&apos;t have an account?{" "}
+            <Link
+              className="text-blue-500 underline-offset-2 hover:underline"
+              href={"/auth/signup"}
+            >
+              Sign up
+            </Link>
+          </FormDescription>
+        </FormItem>
+        <FormItem className="col-span-full">
           <LoadingButton
             isLoading={loading.isLoading}
             loadingText="Logging in"
             type="submit"
+            className="w-full"
           >
             Login
           </LoadingButton>
