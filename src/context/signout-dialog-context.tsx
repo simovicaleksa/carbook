@@ -8,6 +8,8 @@ import {
   useState,
 } from "react";
 
+import SignOutDialog from "~/components/auth/signout-dialog";
+
 type SignoutDialogType = {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
@@ -27,6 +29,7 @@ export function SignoutDialogProvider({
 
   return (
     <SignoutDialogContext.Provider value={{ isOpen, setIsOpen, toggleOpen }}>
+      <SignOutDialog />
       {children}
     </SignoutDialogContext.Provider>
   );

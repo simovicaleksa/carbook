@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 
 import { getCurrentSession } from "~/lib/server/auth";
 
+import { AddVehicleDialogProvider } from "~/context/add-vehicle-dialog-context";
 import { SignoutDialogProvider } from "~/context/signout-dialog-context";
 import { UserProvider } from "~/context/user-context";
 
@@ -23,11 +24,13 @@ export default async function DashboardLayout({
   return (
     <UserProvider value={user}>
       <SignoutDialogProvider>
-        <SignOutDialog />
-        <SidebarProvider>
-          <AppSidebar />
-          <main className="w-full p-5">{children}</main>
-        </SidebarProvider>
+        <AddVehicleDialogProvider>
+          <SignOutDialog />
+          <SidebarProvider>
+            <AppSidebar />
+            <main className="w-full p-5">{children}</main>
+          </SidebarProvider>
+        </AddVehicleDialogProvider>
       </SignoutDialogProvider>
     </UserProvider>
   );
