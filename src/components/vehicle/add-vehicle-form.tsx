@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type z } from "zod";
 
-import { getCarManufacturers } from "~/app/actions/vehicle";
 import { addVehicleSchema } from "~/app/actions/vehicle-validators";
 
 import { useLoading } from "~/hooks/use-loading";
@@ -26,10 +25,6 @@ export default function AddVehicleForm() {
 
   async function onSubmit(values: z.infer<typeof addVehicleSchema>) {
     loading.start();
-
-    const res = await getCarManufacturers();
-
-    console.log(res);
 
     loading.end();
   }
