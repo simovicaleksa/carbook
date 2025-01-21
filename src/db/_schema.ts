@@ -17,7 +17,7 @@ export const userTable = pgTable("users", {
   email: text("email").notNull().unique(),
   username: varchar("username", { length: 16 }).notNull().unique(),
   password: text("password").notNull(),
-  role: text("role", { enum: ["user", "mechanic"] })
+  role: text("role", { enum: ["user", "admin"] })
     .default("user")
     .notNull(),
   prefersImperial: boolean("prefers_imperial").default(false).notNull(),

@@ -28,7 +28,6 @@ export const signupSchema = z
       .string({ message: "Confirm password is required" })
       .min(6, { message: "Confirm password must be at least 6 characters" })
       .max(255, { message: "Confirm password cannot exceed 255 characters" }),
-    role: z.enum(["user", "mechanic"], { message: "Role is required" }),
   })
   .refine((ctx) => ctx.password === ctx.confirmPassword, {
     message: "Confirm password must match password",
