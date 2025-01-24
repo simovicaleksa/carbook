@@ -1,11 +1,17 @@
+import { useRouter } from "next/navigation";
+
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import { type z } from "zod";
 
 import { addVehicleSchema } from "~/app/actions/vehicle-validators";
+import { createUserVehicle } from "~/app/dashboard/actions";
 
 import { cn } from "~/lib/utils";
+
+import { useAddVehicleDialog } from "~/context/add-vehicle-dialog-context";
 
 import { useLoading } from "~/hooks/use-loading";
 import { useIsMobile } from "~/hooks/use-mobile";
@@ -28,11 +34,25 @@ import LoadingButton from "../ui/loading-button";
 export default function AddVehicleForm() {
   const loading = useLoading();
   const isMobile = useIsMobile();
+  const router = useRouter();
+  const { setIsOpen } = useAddVehicleDialog();
 
   async function onSubmit(values: z.infer<typeof addVehicleSchema>) {
     loading.start();
 
-    console.log(values);
+    const res = await createUserVehicle(values);
+
+    if (!res.ok) {
+      toast.error("Error", {
+        description: res.error?.message,
+      });
+    } else {
+      toast.success("Success", {
+        description: "Vehicle has been added to your account",
+      });
+      setIsOpen(false);
+      router.refresh();
+    }
 
     loading.end();
   }
