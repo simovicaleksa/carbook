@@ -30,8 +30,26 @@ export const userTable = pgTable("users", {
   ),
 });
 
-export const userRelations = relations(userTable, ({ many }) => ({
+export const userRelations = relations(userTable, ({ one, many }) => ({
   vehicles: many(vehicleTable),
+  profile: one(userProfileTable),
+}));
+
+export const userProfileTable = pgTable("user_profiles", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => userTable.id, {
+      onDelete: "cascade",
+    }),
+});
+
+export const userProfileRelations = relations(userProfileTable, ({ one }) => ({
+  user: one(userTable, {
+    fields: [userProfileTable.userId],
+    references: [userTable.id],
+  }),
+  selectedVehicle: one(vehicleTable),
 }));
 
 export const sessionTable = pgTable("sessions", {
@@ -55,6 +73,9 @@ export const vehicleTable = pgTable("vehicles", {
   ownerId: uuid("owner_id")
     .notNull()
     .references(() => userTable.id, { onDelete: "set null" }),
+  userProfileId: uuid("user_profile_id")
+    .notNull()
+    .references(() => userProfileTable.id, { onDelete: "cascade" }),
   createdAt: timestamp("created_at", {
     mode: "date",
     precision: 3,
@@ -68,6 +89,10 @@ export const vehicleRelations = relations(vehicleTable, ({ one, many }) => ({
   user: one(userTable, {
     fields: [vehicleTable.ownerId],
     references: [userTable.id],
+  }),
+  userProfile: one(userProfileTable, {
+    fields: [vehicleTable.userProfileId],
+    references: [userProfileTable.id],
   }),
   history: many(historyTable),
 }));
