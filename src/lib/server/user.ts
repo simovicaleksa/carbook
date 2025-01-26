@@ -4,7 +4,7 @@ import { type z } from "zod";
 import { type signupSchema } from "~/app/auth/signup/validators";
 
 import { db } from "~/db";
-import { userTable } from "~/db/_schema";
+import { userProfileTable, userTable } from "~/db/_schema";
 
 import { hashPassword } from "./password";
 import { lower } from "./sql";
@@ -33,6 +33,8 @@ export async function createUser(user: z.infer<typeof signupSchema>) {
   if (!dbUser) {
     throw new Error("Failed to create user");
   }
+
+  await db.insert(userProfileTable).values({ userId: dbUser.id });
 
   return dbUser;
 }

@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 
 import { db } from "~/db";
-import { vehicleTable } from "~/db/_schema";
+import { userProfileTable, vehicleTable } from "~/db/_schema";
 
 export async function getVehicleFromId(vehicleId: string) {
   const [vehicle] = await db
@@ -35,14 +35,23 @@ export async function createVehicle(
     distanceTraveled: number;
   },
 ) {
-  await db.insert(vehicleTable).values({
-    make,
-    model,
-    year,
-    distanceTraveled,
-    type,
-    ownerId: userId,
-  });
+  const [vehicle] = await db
+    .insert(vehicleTable)
+    .values({
+      make,
+      model,
+      year,
+      distanceTraveled,
+      type,
+      ownerId: userId,
+    })
+    .returning();
+
+  if (!vehicle) {
+    throw new Error("Failed to create vehicle");
+  }
+
+  return vehicle;
 }
 
 export async function updateVehicle(
@@ -70,4 +79,19 @@ export async function updateVehicle(
 
 export async function deleteVehicle(vehicleId: string) {
   await db.delete(vehicleTable).where(eq(vehicleTable.id, vehicleId));
+}
+
+export async function getSelectedVehicleFromUserId(userId: string) {
+  const userProfile = await db.query.userProfileTable.findFirst({
+    where: eq(userProfileTable.userId, userId),
+    with: {
+      selectedVehicle: true,
+    },
+  });
+
+  if (!userProfile) {
+    throw new Error("User not found");
+  }
+
+  return userProfile.selectedVehicle;
 }

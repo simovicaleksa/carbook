@@ -32,10 +32,10 @@ export default function VehicleSwitcher() {
   const isMobile = useIsMobile();
   const { toggleOpen } = useAddVehicleDialog();
   const { vehicles } = useUserVehicles();
-  const { selectedVehicle, setSelectedVehicle } = useSelectedVehicle();
+  const { selectedVehicle, changeSelectedVehicle } = useSelectedVehicle();
 
-  const handleVehicleChange = (vehicle: VehicleType) => {
-    setSelectedVehicle(vehicle);
+  const handleVehicleChange = async (vehicle: VehicleType) => {
+    await changeSelectedVehicle(vehicle);
   };
 
   return (

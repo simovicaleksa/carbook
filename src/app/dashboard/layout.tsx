@@ -12,7 +12,7 @@ import SignOutDialog from "~/components/auth/signout-dialog";
 import AppSidebar from "~/components/dashboard/sidebar/app-sidebar";
 import { SidebarProvider } from "~/components/ui/sidebar";
 
-import { getUserVehicles } from "./actions";
+import { getUserSelectedVehicle, getUserVehicles } from "./actions";
 
 export default async function DashboardLayout({
   children,
@@ -26,11 +26,14 @@ export default async function DashboardLayout({
   }
 
   const { data: vehicles } = await getUserVehicles();
+  const { data: selectedVehicle } = await getUserSelectedVehicle(user.id);
+
+  console.log(selectedVehicle);
 
   return (
     <UserProvider value={user}>
       <UserVehiclesProvider value={{ vehicles: vehicles ?? [] }}>
-        <SelectedVehicleProvider defaultValue={vehicles?.[0] ?? null}>
+        <SelectedVehicleProvider defaultValue={selectedVehicle ?? null}>
           <SignoutDialogProvider>
             <AddVehicleDialogProvider>
               <SignOutDialog />
