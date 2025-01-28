@@ -43,8 +43,10 @@ export function SelectedVehicleProvider({
   }, [defaultValue]);
 
   async function changeSelectedVehicle(newSelectedVehicle: VehicleType) {
-    setSelectedVehicle(newSelectedVehicle);
-    await updateUserSelectedVehicle(newSelectedVehicle.id);
+    const res = await updateUserSelectedVehicle(newSelectedVehicle.id);
+    if (res.ok) {
+      setSelectedVehicle(newSelectedVehicle);
+    }
   }
 
   return (
