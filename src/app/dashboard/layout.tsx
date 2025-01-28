@@ -28,8 +28,6 @@ export default async function DashboardLayout({
   const { data: vehicles } = await getUserVehicles();
   const { data: selectedVehicle } = await getUserSelectedVehicle(user.id);
 
-  console.log(selectedVehicle);
-
   return (
     <UserProvider value={user}>
       <UserVehiclesProvider value={{ vehicles: vehicles ?? [] }}>
