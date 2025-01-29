@@ -22,3 +22,15 @@ You can track the following:
 - Gas refilling
 - Cleaning history
 - Mileage milestones
+
+# TODO
+
+- [ ] Car history
+- [ ] Imperial and Metric system support
+- [ ] Dashboard home page
+- [ ] Upcoming maintenance
+- [ ] Premium plan
+- [ ] Car ownership transfer
+- [ ] Car sharing
+- [ ] Statistics
+- [ ] Car history import / export as portfolio
