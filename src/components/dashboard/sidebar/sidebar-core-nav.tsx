@@ -2,7 +2,14 @@
 
 import { usePathname } from "next/navigation";
 
-import { ChartLine, ChartNoAxesGantt, Home } from "lucide-react";
+import {
+  Bell,
+  ChartLine,
+  ChartNoAxesGantt,
+  Home,
+  Mail,
+  Settings,
+} from "lucide-react";
 
 import {
   SidebarGroup,
@@ -28,6 +35,21 @@ const coreItems = [
     title: "Statistics",
     url: "/dashboard/statistics",
     icon: <ChartLine />,
+  },
+  {
+    title: "Upcoming",
+    url: "/dashboard/reminders",
+    icon: <Bell />,
+  },
+  {
+    title: "Invites",
+    url: "/dashboard/invites",
+    icon: <Mail />,
+  },
+  {
+    title: "Settings",
+    url: "/dashboard/settings",
+    icon: <Settings />,
   },
 ];
 

@@ -2,13 +2,13 @@ import { redirect } from "next/navigation";
 
 import { getCurrentSession } from "~/lib/server/auth";
 
+import { AddHistoryEventDialogProvider } from "~/context/add-history-event-dialog-context";
 import { AddVehicleDialogProvider } from "~/context/add-vehicle-dialog-context";
 import { SelectedVehicleProvider } from "~/context/selected-vehicle-context";
 import { SignoutDialogProvider } from "~/context/signout-dialog-context";
 import { UserProvider } from "~/context/user-context";
 import { UserVehiclesProvider } from "~/context/user-vehicles-context";
 
-import SignOutDialog from "~/components/auth/signout-dialog";
 import AppSidebar from "~/components/dashboard/sidebar/app-sidebar";
 import { SidebarProvider } from "~/components/ui/sidebar";
 
@@ -34,11 +34,12 @@ export default async function DashboardLayout({
         <SelectedVehicleProvider defaultValue={selectedVehicle ?? null}>
           <SignoutDialogProvider>
             <AddVehicleDialogProvider>
-              <SignOutDialog />
-              <SidebarProvider>
-                <AppSidebar />
-                <main className="w-full p-5">{children}</main>
-              </SidebarProvider>
+              <AddHistoryEventDialogProvider>
+                <SidebarProvider>
+                  <AppSidebar />
+                  {children}
+                </SidebarProvider>
+              </AddHistoryEventDialogProvider>
             </AddVehicleDialogProvider>
           </SignoutDialogProvider>
         </SelectedVehicleProvider>

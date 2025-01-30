@@ -1,12 +1,13 @@
 "use server";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { type z, ZodError } from "zod";
 
 import { db } from "~/db";
-import { userProfileTable } from "~/db/_schema";
+import { userProfileTable, vehicleTable } from "~/db/_schema";
 
 import { AuthorizationError, authorize } from "~/lib/server/authorize";
+import { createHistoryEvent } from "~/lib/server/history";
 import {
   getUserProfileFromUserId,
   updateUserProfileSelectedVehicle,
@@ -18,6 +19,7 @@ import {
   getVehiclesFromUserId,
 } from "~/lib/server/vehicle";
 
+import { addHistoryEventSchema } from "../actions/history-validators";
 import { addVehicleSchema } from "../actions/vehicle-validators";
 
 export async function getUserVehicles() {
@@ -192,6 +194,53 @@ export async function updateUserSelectedVehicle(vehicleId: string) {
       return {
         ok: false,
         status: 401,
+        error: error,
+      };
+    return {
+      ok: false,
+      status: 500,
+      error: error as Error,
+    };
+  }
+}
+
+export async function createUserHistoryEvent(
+  vehicleId: string,
+  newEvent: z.infer<typeof addHistoryEventSchema>,
+) {
+  try {
+    await authorize(async (user) => {
+      const vehicle = await db.query.vehicleTable.findFirst({
+        where: and(
+          eq(vehicleTable.id, vehicleId),
+          eq(vehicleTable.ownerId, user.id),
+        ),
+      });
+
+      if (!vehicle) return false;
+
+      return true;
+    });
+
+    addHistoryEventSchema.parse(newEvent);
+
+    await createHistoryEvent(vehicleId, newEvent);
+
+    return {
+      ok: true,
+      status: 200,
+    };
+  } catch (error) {
+    if (error instanceof AuthorizationError)
+      return {
+        ok: false,
+        status: 401,
+        error: error,
+      };
+    if (error instanceof ZodError)
+      return {
+        ok: false,
+        status: 400,
         error: error,
       };
     return {

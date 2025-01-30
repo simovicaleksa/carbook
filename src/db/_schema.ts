@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
 import {
   boolean,
+  date,
   integer,
   pgTable,
   serial,
@@ -106,7 +107,6 @@ export const historyTable = pgTable("history", {
     enum: [
       "refuel",
       "service",
-      "maintenance",
       "repair",
       "replacement",
       "purchase",
@@ -120,6 +120,7 @@ export const historyTable = pgTable("history", {
     ],
   }),
   description: text("description").default(""),
+  date: date("date", { mode: "date" }).notNull().defaultNow(),
   vehicleId: uuid("vehicle_id")
     .notNull()
     .references(() => vehicleTable.id, { onDelete: "cascade" }),
