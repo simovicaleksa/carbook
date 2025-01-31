@@ -4,6 +4,7 @@ import {
   AppLayoutHeader,
 } from "~/components/dashboard/layout/app-layout";
 import AddHistoryEventHeaderButton from "~/components/history/add-history-event-header-button";
+import HistoryTimeline from "~/components/history/history-timeline";
 
 export default function History() {
   return (
@@ -12,7 +13,9 @@ export default function History() {
         title="History"
         action={<AddHistoryEventHeaderButton />}
       />
-      <AppLayoutContent></AppLayoutContent>
+      <AppLayoutContent>
+        <HistoryTimeline />
+      </AppLayoutContent>
     </AppLayout>
   );
 }

@@ -102,7 +102,7 @@ export const vehicleRelations = relations(vehicleTable, ({ one, many }) => ({
 
 export const historyTable = pgTable("history", {
   id: serial("id").primaryKey(),
-  atDistanceTraveled: integer("at_distance_traveled"),
+  atDistanceTraveled: integer("at_distance_traveled").notNull(),
   type: text("type", {
     enum: [
       "refuel",
@@ -120,7 +120,7 @@ export const historyTable = pgTable("history", {
     ],
   }),
   description: text("description").default(""),
-  date: date("date", { mode: "date" }).notNull().defaultNow(),
+  date: date("date", { mode: "date" }).notNull(),
   vehicleId: uuid("vehicle_id")
     .notNull()
     .references(() => vehicleTable.id, { onDelete: "cascade" }),

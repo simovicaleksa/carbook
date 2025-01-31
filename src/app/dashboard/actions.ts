@@ -1,10 +1,10 @@
 "use server";
 
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq, lt, gt } from "drizzle-orm";
 import { type z, ZodError } from "zod";
 
 import { db } from "~/db";
-import { userProfileTable, vehicleTable } from "~/db/_schema";
+import { historyTable, userProfileTable, vehicleTable } from "~/db/_schema";
 
 import { AuthorizationError, authorize } from "~/lib/server/authorize";
 import { createHistoryEvent } from "~/lib/server/history";
@@ -223,6 +223,66 @@ export async function createUserHistoryEvent(
     });
 
     addHistoryEventSchema.parse(newEvent);
+
+    // Check for preceding events with higher distance traveled
+    const precedingConflict = await db
+      .select()
+      .from(historyTable)
+      .where(
+        and(
+          eq(historyTable.vehicleId, vehicleId),
+          lt(historyTable.date, newEvent.date),
+          gt(historyTable.atDistanceTraveled, newEvent.atDistanceTraveled),
+        ),
+      )
+      .limit(1);
+
+    if (precedingConflict.length > 0) {
+      return {
+        ok: false,
+        status: 400,
+        error: new Error("Older entry with higher distance traveled exists"),
+      };
+    }
+
+    // Check for upcoming events with lower distance traveled
+    const upcomingConflict = await db
+      .select()
+      .from(historyTable)
+      .where(
+        and(
+          eq(historyTable.vehicleId, vehicleId),
+          gt(historyTable.date, newEvent.date),
+          lt(historyTable.atDistanceTraveled, newEvent.atDistanceTraveled),
+        ),
+      )
+      .limit(1);
+
+    if (upcomingConflict.length > 0) {
+      return {
+        ok: false,
+        status: 400,
+        error: new Error("Newer entry with lower distance traveled exists"),
+      };
+    }
+
+    const latestEvent = await db.query.historyTable.findFirst({
+      orderBy: desc(historyTable.atDistanceTraveled),
+      where: and(eq(historyTable.vehicleId, vehicleId)),
+    });
+
+    // update current vehicle distanceTraveled
+    if (
+      !latestEvent ||
+      latestEvent.atDistanceTraveled < newEvent.atDistanceTraveled
+    ) {
+      await db
+        .update(vehicleTable)
+        .set({
+          distanceTraveled: newEvent.atDistanceTraveled,
+        })
+        .where(eq(vehicleTable.id, vehicleId));
+    }
 
     await createHistoryEvent(vehicleId, newEvent);
 

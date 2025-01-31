@@ -12,3 +12,9 @@ export async function createHistoryEvent(
     vehicleId,
   });
 }
+
+// export async function getHistoryEvents(vehicleId: string) {
+//   return await db.select().from(historyTable).where({
+
+//   })
+// }

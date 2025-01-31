@@ -162,7 +162,11 @@ export default function AddVehicleForm() {
                 Cancel
               </Button>
             </AlertDialogCancel>
-            <LoadingButton isLoading={loading.isLoading} type="submit">
+            <LoadingButton
+              isLoading={loading.isLoading}
+              type="submit"
+              loadingText="Adding vehicle"
+            >
               Add vehicle
             </LoadingButton>
           </AlertDialogFooter>

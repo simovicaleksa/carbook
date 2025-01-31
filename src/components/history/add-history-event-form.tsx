@@ -160,8 +160,12 @@ export default function AddHistoryEventForm() {
                 Cancel
               </Button>
             </AlertDialogCancel>
-            <LoadingButton isLoading={loading.isLoading} type="submit">
-              Add vehicle
+            <LoadingButton
+              isLoading={loading.isLoading}
+              type="submit"
+              loadingText="Adding event"
+            >
+              Add event
             </LoadingButton>
           </AlertDialogFooter>
         </form>
