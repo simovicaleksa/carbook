@@ -160,23 +160,71 @@ export async function getVehicleHistoryEvents(vehicleId: string) {
 
 export async function updateVehicleHistoryEvent(
   eventId: number,
-  newEvent: Partial<EventType>,
+  newEvent: EventType,
 ) {
   try {
     addHistoryEventSchema.partial().parse(newEvent);
+    const event = await db.query.historyTable.findFirst({
+      where: eq(historyTable.id, eventId),
+      with: {
+        vehicle: true,
+      },
+    });
+
+    if (!event) {
+      return {
+        ok: false,
+        status: 404,
+        error: new Error("Event not found"),
+      };
+    }
 
     await authorize(async (user) => {
-      const event = await db.query.historyTable.findFirst({
-        where: eq(historyTable.id, eventId),
-        with: {
-          vehicle: true,
-        },
-      });
-
-      if (event?.vehicle.ownerId !== user.id) return false;
-
+      if (event.vehicle.ownerId !== user.id) return false;
       return true;
     });
+
+    // Check for preceding events with higher distance traveled
+    const precedingConflict = await db
+      .select()
+      .from(historyTable)
+      .where(
+        and(
+          eq(historyTable.vehicleId, event.vehicleId),
+          lt(historyTable.date, newEvent.date),
+          gt(historyTable.atDistanceTraveled, newEvent.atDistanceTraveled),
+        ),
+      )
+      .limit(1);
+
+    if (precedingConflict.length > 0) {
+      return {
+        ok: false,
+        status: 400,
+        error: new Error("Older entry with higher distance traveled exists"),
+      };
+    }
+
+    // Check for upcoming events with lower distance traveled
+    const upcomingConflict = await db
+      .select()
+      .from(historyTable)
+      .where(
+        and(
+          eq(historyTable.vehicleId, event.vehicleId),
+          gt(historyTable.date, newEvent.date),
+          lt(historyTable.atDistanceTraveled, newEvent.atDistanceTraveled),
+        ),
+      )
+      .limit(1);
+
+    if (upcomingConflict.length > 0) {
+      return {
+        ok: false,
+        status: 400,
+        error: new Error("Newer entry with lower distance traveled exists"),
+      };
+    }
 
     await updateHistoryEvent(eventId, newEvent);
 
