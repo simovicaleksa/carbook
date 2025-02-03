@@ -118,7 +118,7 @@ export const historyTable = pgTable("history", {
       "accident",
       "other",
     ],
-  }),
+  }).notNull(),
   description: text("description").default(""),
   date: date("date", { mode: "date" }).notNull(),
   vehicleId: uuid("vehicle_id")
