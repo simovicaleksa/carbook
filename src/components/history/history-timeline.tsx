@@ -66,8 +66,13 @@ export function HistoryTimelineItem({
       <div className="z-10 flex aspect-square size-fit items-center justify-center rounded-full bg-primary p-3 text-primary-foreground shadow-xl">
         <Icon className="size-5" />
       </div>
-      <div className="group relative w-full">
-        <Card>
+      <div className="group relative w-full duration-200 ease-out hover:scale-105">
+        <Card
+          className="cursor-pointer shadow-xl"
+          role="button"
+          tabIndex={0}
+          aria-label="View event details"
+        >
           <CardContent className="px-0">
             <CardHeader>
               <CardTitle className="mb-2 capitalize">{event.type}</CardTitle>
@@ -95,15 +100,25 @@ export function HistoryTimelineItem({
             </CardFooter>
           </CardContent>
         </Card>
-        <Button
-          variant={"outline"}
-          className="absolute -right-5 bottom-0 top-0 z-10 my-auto rounded-full opacity-0 shadow-md transition-opacity duration-300 group-hover:opacity-100"
-          size={"icon"}
-          onClick={handleEdit}
-        >
-          <span className="sr-only">Edit event</span>
-          <Edit />
-        </Button>
+        <div className="absolute -right-5 bottom-0 top-0 z-10 my-auto flex h-fit flex-col gap-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+          <Button
+            variant={"outline"}
+            className="rounded-full shadow-md"
+            size={"icon"}
+            onClick={handleEdit}
+          >
+            <span className="sr-only">Edit event</span>
+            <Edit />
+          </Button>
+          {/* <Button
+            variant={"destructive"}
+            className="rounded-full shadow-md"
+            size={"icon"}
+          >
+            <span className="sr-only">Edit event</span>
+            <Trash2 />
+          </Button> */}
+        </div>
       </div>
     </div>
   );
