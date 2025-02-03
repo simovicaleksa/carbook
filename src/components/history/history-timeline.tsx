@@ -1,12 +1,13 @@
 "use client";
 
-import { Calendar, Milestone } from "lucide-react";
+import { Calendar, Edit, Milestone } from "lucide-react";
 
 import { cn } from "~/lib/utils";
 import { convertToLocalDateString } from "~/lib/utils/date";
 import { getEventTypeIcon } from "~/lib/utils/icon";
 import { formatNumber } from "~/lib/utils/number";
 
+import { useEditHistoryDialog } from "~/context/edit-history-dialog-context";
 import { type EventType, useEvents } from "~/context/events-context";
 
 import { Button } from "../ui/button";
@@ -25,7 +26,7 @@ export default function HistoryTimeline() {
   return (
     <div className="relative size-full">
       <span className="absolute left-0 right-0 mx-auto h-full w-0.5 bg-border" />
-      <div className="mx-auto flex max-w-4xl flex-col justify-between gap-10">
+      <div className="mx-auto flex w-full max-w-4xl flex-col justify-between gap-10">
         {events.map((event, idx) => (
           <HistoryTimelineItem
             key={event.id}
@@ -34,6 +35,7 @@ export default function HistoryTimeline() {
           />
         ))}
       </div>
+      <HistoryTimelineLoadMore />
     </div>
   );
 }
@@ -45,7 +47,12 @@ export function HistoryTimelineItem({
   event: EventType;
   isLeft?: boolean;
 }) {
+  const { toggleOpen } = useEditHistoryDialog();
   const Icon = getEventTypeIcon(event.type);
+
+  const handleEdit = () => {
+    toggleOpen(event);
+  };
 
   if (!Icon) return null;
 
@@ -59,38 +66,53 @@ export function HistoryTimelineItem({
       <div className="z-10 flex aspect-square size-fit items-center justify-center rounded-full bg-primary p-3 text-primary-foreground shadow-xl">
         <Icon className="size-5" />
       </div>
-      <Card className="w-full">
-        <CardContent className="px-0">
-          <CardHeader>
-            <CardTitle className="capitalize">{event.type}</CardTitle>
-            <CardDescription className="flex flex-row gap-5">
-              <span className="flex flex-row items-center gap-1">
-                <Calendar className="size-4" />
-                {convertToLocalDateString(event.date, true)}
-              </span>
-              <span className="flex flex-row items-center gap-1">
-                <Milestone className="size-4" />
-                {formatNumber(event.atDistanceTraveled)} km
-              </span>
-            </CardDescription>
-          </CardHeader>
-          <CardFooter className="pb-0">
-            {event.description?.length ? (
-              <p className="line-clamp-3 font-mono text-muted-foreground">
-                {event.description}
-              </p>
-            ) : (
-              <p className="line-clamp-3 font-mono italic text-muted-foreground">
-                No description.
-              </p>
-            )}
-          </CardFooter>
-        </CardContent>
-      </Card>
+      <div className="group relative w-full">
+        <Card>
+          <CardContent className="px-0">
+            <CardHeader>
+              <CardTitle className="mb-2 capitalize">{event.type}</CardTitle>
+              <CardDescription className="flex flex-row gap-5 font-medium">
+                <span className="flex flex-row items-center gap-1">
+                  <Calendar className="size-4" />
+                  {convertToLocalDateString(event.date, true)}
+                </span>
+                <span className="flex flex-row items-center gap-1">
+                  <Milestone className="size-4" />
+                  {formatNumber(event.atDistanceTraveled)} km
+                </span>
+              </CardDescription>
+            </CardHeader>
+            <CardFooter className="pb-0">
+              {event.description?.length ? (
+                <p className="line-clamp-3 font-mono text-muted-foreground">
+                  {event.description}
+                </p>
+              ) : (
+                <p className="line-clamp-3 font-mono italic text-muted-foreground">
+                  No description.
+                </p>
+              )}
+            </CardFooter>
+          </CardContent>
+        </Card>
+        <Button
+          variant={"outline"}
+          className="absolute -right-5 bottom-0 top-0 z-10 my-auto rounded-full opacity-0 shadow-md transition-opacity duration-300 group-hover:opacity-100"
+          size={"icon"}
+          onClick={handleEdit}
+        >
+          <span className="sr-only">Edit event</span>
+          <Edit />
+        </Button>
+      </div>
     </div>
   );
 }
 
 export function HistoryTimelineLoadMore() {
-  return <Button>Load more</Button>;
+  return (
+    <div className="mt-10 flex w-full items-center justify-center">
+      <Button className="z-10 mx-auto w-fit">Load more</Button>
+    </div>
+  );
 }

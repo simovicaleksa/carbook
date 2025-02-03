@@ -9,7 +9,13 @@ import { db } from "~/db";
 import { historyTable, vehicleTable } from "~/db/_schema";
 
 import { AuthorizationError, authorize } from "~/lib/server/authorize";
-import { createHistoryEvent, getHistoryEvents } from "~/lib/server/history";
+import {
+  createHistoryEvent,
+  getHistoryEvents,
+  updateHistoryEvent,
+} from "~/lib/server/history";
+
+import { type EventType } from "~/context/events-context";
 
 export async function createUserHistoryEvent(
   vehicleId: string,
@@ -142,6 +148,54 @@ export async function getVehicleHistoryEvents(vehicleId: string) {
       return {
         ok: false,
         status: 401,
+        error: error,
+      };
+    return {
+      ok: false,
+      status: 500,
+      error: error as Error,
+    };
+  }
+}
+
+export async function updateVehicleHistoryEvent(
+  eventId: number,
+  newEvent: Partial<EventType>,
+) {
+  try {
+    addHistoryEventSchema.partial().parse(newEvent);
+
+    await authorize(async (user) => {
+      const event = await db.query.historyTable.findFirst({
+        where: eq(historyTable.id, eventId),
+        with: {
+          vehicle: true,
+        },
+      });
+
+      if (event?.vehicle.ownerId !== user.id) return false;
+
+      return true;
+    });
+
+    await updateHistoryEvent(eventId, newEvent);
+
+    return {
+      ok: true,
+      status: 200,
+      data: newEvent,
+    };
+  } catch (error) {
+    if (error instanceof AuthorizationError)
+      return {
+        ok: false,
+        status: 401,
+        error: error,
+      };
+    if (error instanceof ZodError)
+      return {
+        ok: false,
+        status: 400,
         error: error,
       };
     return {

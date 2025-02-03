@@ -5,6 +5,8 @@ import { type addHistoryEventSchema } from "~/app/actions/history-validators";
 import { db } from "~/db";
 import { historyTable } from "~/db/_schema";
 
+import { type EventType } from "~/context/events-context";
+
 export async function createHistoryEvent(
   vehicleId: string,
   newEvent: Zod.infer<typeof addHistoryEventSchema>,
@@ -21,4 +23,11 @@ export async function getHistoryEvents(vehicleId: string) {
     orderBy: desc(historyTable.date),
     limit: 20,
   });
+}
+
+export async function updateHistoryEvent(
+  eventId: number,
+  event: Partial<EventType>,
+) {
+  await db.update(historyTable).set(event).where(eq(historyTable.id, eventId));
 }
