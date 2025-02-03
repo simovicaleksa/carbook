@@ -17,65 +17,61 @@ export const eventTypes = [
   {
     value: "refuel",
     label: "Refuel",
-    icon: <Fuel className="mb-2 size-7 text-muted-foreground sm:size-5" />,
+    icon: Fuel,
   },
   {
     value: "service",
     label: "Service",
-    icon: <Wrench className="mb-2 size-7 text-muted-foreground sm:size-5" />,
+    icon: Wrench,
   },
   {
     value: "repair",
     label: "Repair",
-    icon: <Hammer className="mb-2 size-7 text-muted-foreground sm:size-5" />,
+    icon: Hammer,
   },
   {
     value: "replacement",
     label: "Replacement",
-    icon: <RefreshCw className="mb-2 size-7 text-muted-foreground sm:size-5" />,
+    icon: RefreshCw,
   },
   {
     value: "purchase",
     label: "Purchase",
-    icon: <Coins className="mb-2 size-7 text-muted-foreground sm:size-5" />,
+    icon: Coins,
   },
   {
     value: "inspection",
     label: "Inspection",
-    icon: <Search className="mb-2 size-7 text-muted-foreground sm:size-5" />,
+    icon: Search,
   },
   {
     value: "tune-up",
     label: "Tune-up",
-    icon: <Zap className="mb-2 size-7 text-muted-foreground sm:size-5" />,
+    icon: Zap,
   },
   {
     value: "wash",
     label: "Wash",
-    icon: <Droplets className="mb-2 size-7 text-muted-foreground sm:size-5" />,
+    icon: Droplets,
   },
   {
     value: "milestone",
     label: "Milestone",
-    icon: <Milestone className="mb-2 size-7 text-muted-foreground sm:size-5" />,
+    icon: Milestone,
   },
   {
     value: "upgrade",
     label: "Upgrade",
-    icon: <Drill className="mb-2 size-7 text-muted-foreground sm:size-5" />,
+    icon: Drill,
   },
   {
     value: "accident",
     label: "Accident",
-    icon: (
-      <TriangleAlert className="mb-2 size-7 text-muted-foreground sm:size-5" />
-    ),
+    icon: TriangleAlert,
   },
   {
     value: "other",
     label: "Other",
-    icon: (
-      <CircleEllipsis className="mb-2 size-7 text-muted-foreground sm:size-5" />
-    ),
+    icon: CircleEllipsis,
   },
 ];
