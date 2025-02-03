@@ -11,6 +11,7 @@ import { historyTable, vehicleTable } from "~/db/_schema";
 import { AuthorizationError, authorize } from "~/lib/server/authorize";
 import {
   createHistoryEvent,
+  deleteHistoryEvent,
   getHistoryEvents,
   updateHistoryEvent,
 } from "~/lib/server/history";
@@ -242,6 +243,42 @@ export async function updateVehicleHistoryEvent(
       return {
         ok: false,
         status: 400,
+        error: error,
+      };
+    return {
+      ok: false,
+      status: 500,
+      error: error as Error,
+    };
+  }
+}
+
+export async function deleteVehicleHistoryEvent(eventId: number) {
+  try {
+    await authorize(async (user) => {
+      const event = await db.query.historyTable.findFirst({
+        where: eq(historyTable.id, eventId),
+        with: {
+          vehicle: true,
+        },
+      });
+
+      if (event?.vehicle.ownerId !== user.id) return false;
+
+      return true;
+    });
+
+    await deleteHistoryEvent(eventId);
+
+    return {
+      ok: true,
+      status: 200,
+    };
+  } catch (error) {
+    if (error instanceof AuthorizationError)
+      return {
+        ok: false,
+        status: 401,
         error: error,
       };
     return {

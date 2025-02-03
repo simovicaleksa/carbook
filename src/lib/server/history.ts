@@ -31,3 +31,7 @@ export async function updateHistoryEvent(
 ) {
   await db.update(historyTable).set(event).where(eq(historyTable.id, eventId));
 }
+
+export async function deleteHistoryEvent(eventId: number) {
+  await db.delete(historyTable).where(eq(historyTable.id, eventId));
+}
