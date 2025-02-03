@@ -139,8 +139,10 @@ export default function AddHistoryEventForm() {
                   /> */}
                   <Input
                     type="date"
-                    value={field.value.toString()}
-                    onChange={field.onChange}
+                    value={
+                      field.value ? field.value.toISOString().split("T")[0] : ""
+                    }
+                    onChange={(e) => field.onChange(new Date(e.target.value))}
                   />
                 </FormControl>
                 <FormMessage />
