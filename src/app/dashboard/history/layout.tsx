@@ -1,7 +1,23 @@
+import { notFound } from "next/navigation";
+
+import { EventsProvider } from "~/context/events-context";
+
+import { getCurrentSelectedVehicle } from "../actions";
+
+import { getVehicleHistoryEvents } from "./actions";
+
 export default async function HistoryLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  const { data: selectedVehicle } = await getCurrentSelectedVehicle();
+
+  if (!selectedVehicle) return notFound();
+
+  const { data: events } = await getVehicleHistoryEvents(selectedVehicle.id);
+
+  return (
+    <EventsProvider defaultValue={events ?? []}>{children}</EventsProvider>
+  );
 }
