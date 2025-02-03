@@ -15,8 +15,6 @@ import {
   updateHistoryEvent,
 } from "~/lib/server/history";
 
-import { type EventType } from "~/context/events-context";
-
 export async function createUserHistoryEvent(
   vehicleId: string,
   newEvent: z.infer<typeof addHistoryEventSchema>,
@@ -160,7 +158,7 @@ export async function getVehicleHistoryEvents(vehicleId: string) {
 
 export async function updateVehicleHistoryEvent(
   eventId: number,
-  newEvent: EventType,
+  newEvent: z.infer<typeof addHistoryEventSchema>,
 ) {
   try {
     addHistoryEventSchema.partial().parse(newEvent);
