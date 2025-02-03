@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import {
   createContext,
   type Dispatch,
@@ -38,6 +40,8 @@ export function SelectedVehicleProvider({
     null,
   );
 
+  const router = useRouter();
+
   useEffect(() => {
     setSelectedVehicle(defaultValue);
   }, [defaultValue]);
@@ -46,6 +50,7 @@ export function SelectedVehicleProvider({
     const res = await updateUserSelectedVehicle(newSelectedVehicle.id);
     if (res.ok) {
       setSelectedVehicle(newSelectedVehicle);
+      router.refresh();
     }
   }
 
