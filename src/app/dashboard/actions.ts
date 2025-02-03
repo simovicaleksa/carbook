@@ -13,7 +13,6 @@ import {
 } from "~/lib/server/user-profile";
 import {
   createVehicle,
-  getSelectedVehicleFromUserId,
   getVehicleFromId,
   getVehiclesFromUserId,
 } from "~/lib/server/vehicle";
@@ -142,16 +141,52 @@ export async function selectUserVehicle(vehicleId: string) {
   }
 }
 
-export async function getUserSelectedVehicle(userId: string) {
+export async function getCurrentSelectedVehicle() {
   try {
-    const user = await authorize((user) => user.id == userId);
+    const user = await authorize();
 
-    const selectedVehicle = await getSelectedVehicleFromUserId(user.id);
+    const userProfile = await db.query.userProfileTable.findFirst({
+      where: eq(userProfileTable.userId, user.id),
+      with: {
+        selectedVehicle: true,
+      },
+    });
 
     return {
       ok: true,
       status: 200,
-      data: selectedVehicle,
+      data: userProfile?.selectedVehicle,
+    };
+  } catch (error) {
+    if (error instanceof AuthorizationError)
+      return {
+        ok: false,
+        status: 401,
+        error: error,
+      };
+    return {
+      ok: false,
+      status: 500,
+      error: error as Error,
+    };
+  }
+}
+
+export async function getUserSelectedVehicle(userId: string) {
+  try {
+    await authorize((user) => user.id == userId);
+
+    const userProfile = await db.query.userProfileTable.findFirst({
+      where: eq(userProfileTable.userId, userId),
+      with: {
+        selectedVehicle: true,
+      },
+    });
+
+    return {
+      ok: true,
+      status: 200,
+      data: userProfile?.selectedVehicle,
     };
   } catch (error) {
     if (error instanceof AuthorizationError)
