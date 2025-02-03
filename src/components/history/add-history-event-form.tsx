@@ -21,7 +21,7 @@ import EventTypeRadio from "../input/event-type-radio";
 import InputWithUnits from "../input/input-with-units";
 import { AlertDialogCancel, AlertDialogFooter } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
-import { DatePicker } from "../ui/date-picker";
+// import { DatePicker } from "../ui/date-picker";
 import {
   Form,
   FormControl,
@@ -30,6 +30,7 @@ import {
   FormLabel,
   FormMessage,
 } from "../ui/form";
+import { Input } from "../ui/input";
 import LoadingButton from "../ui/loading-button";
 import { Textarea } from "../ui/textarea";
 
@@ -100,19 +101,6 @@ export default function AddHistoryEventForm() {
           />
           <FormField
             control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem className="col-span-full">
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea {...field} placeholder="Changed oil filters..." />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
             name="cost"
             render={({ field }) => (
               <FormItem>
@@ -144,16 +132,35 @@ export default function AddHistoryEventForm() {
               <FormItem className="flex flex-col">
                 <FormLabel>Date</FormLabel>
                 <FormControl>
-                  <DatePicker
+                  {/* <DatePicker
                     value={field.value}
                     onValueChange={field.onChange}
                     modal
+                  /> */}
+                  <Input
+                    type="date"
+                    value={field.value.toString()}
+                    onChange={field.onChange}
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
+          <FormField
+            control={form.control}
+            name="description"
+            render={({ field }) => (
+              <FormItem className="col-span-full">
+                <FormLabel>Description</FormLabel>
+                <FormControl>
+                  <Textarea {...field} placeholder="Changed oil filters..." />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <AlertDialogFooter className="col-span-full">
             <AlertDialogCancel asChild>
               <Button variant={"outline"} type="button">
