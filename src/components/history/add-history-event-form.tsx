@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { type z } from "zod";
 
 import { addHistoryEventSchema } from "~/app/actions/history-validators";
-import { createUserHistoryEvent } from "~/app/dashboard/actions";
+import { createUserHistoryEvent } from "~/app/dashboard/history/actions";
 
 import { cn } from "~/lib/utils";
 
