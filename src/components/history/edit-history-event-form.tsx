@@ -12,6 +12,7 @@ import { updateVehicleHistoryEvent } from "~/app/dashboard/history/actions";
 import { cn } from "~/lib/utils";
 
 import { useEditHistoryDialog } from "~/context/edit-history-dialog-context";
+import { useSelectedEvent } from "~/context/selected-event-context";
 
 import { useLoading } from "~/hooks/use-loading";
 import { useIsMobile } from "~/hooks/use-mobile";
@@ -37,7 +38,8 @@ export default function EditHistoryEventForm() {
   const loading = useLoading();
   const isMobile = useIsMobile();
   const router = useRouter();
-  const { setIsOpen, event } = useEditHistoryDialog();
+  const { setIsOpen } = useEditHistoryDialog();
+  const { event } = useSelectedEvent();
 
   const handleCancel = () => setIsOpen(false);
 

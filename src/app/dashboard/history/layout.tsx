@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 
 import { EditHistoryDialogProvider } from "~/context/edit-history-dialog-context";
 import { EventsProvider } from "~/context/events-context";
+import { InspectEventDialogProvider } from "~/context/inspect-event-dialog-context";
+import { SelectedEventProvider } from "~/context/selected-event-context";
 
 import { getCurrentSelectedVehicle } from "../actions";
 
@@ -20,7 +22,11 @@ export default async function HistoryLayout({
 
   return (
     <EventsProvider defaultValue={events ?? []}>
-      <EditHistoryDialogProvider>{children}</EditHistoryDialogProvider>
+      <SelectedEventProvider>
+        <EditHistoryDialogProvider>
+          <InspectEventDialogProvider>{children}</InspectEventDialogProvider>
+        </EditHistoryDialogProvider>
+      </SelectedEventProvider>
     </EventsProvider>
   );
 }

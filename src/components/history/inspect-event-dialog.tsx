@@ -1,14 +1,10 @@
-"use client";
-
-import { useEditHistoryDialog } from "~/context/edit-history-dialog-context";
+import { useInspectEventDialog } from "~/context/inspect-event-dialog-context";
 import { useSelectedEvent } from "~/context/selected-event-context";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 
-import EditHistoryEventForm from "./edit-history-event-form";
-
-export default function EditHistoryDialog() {
-  const { setIsOpen, isOpen } = useEditHistoryDialog();
+export default function InspectEventDialog() {
+  const { isOpen, setIsOpen } = useInspectEventDialog();
   const { event } = useSelectedEvent();
 
   if (!event?.id) return null;
@@ -17,9 +13,8 @@ export default function EditHistoryDialog() {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="w-full max-w-3xl">
         <DialogHeader>
-          <DialogTitle>Edit History Event</DialogTitle>
+          <DialogTitle></DialogTitle>
         </DialogHeader>
-        <EditHistoryEventForm />
       </DialogContent>
     </Dialog>
   );

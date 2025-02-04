@@ -8,28 +8,27 @@ import {
   useState,
 } from "react";
 
-import EditHistoryDialog from "~/components/history/edit-event-dialog";
+import InspectEventDialog from "~/components/history/inspect-event-dialog";
 
 import { type EventType } from "./events-context";
 import { useSelectedEvent } from "./selected-event-context";
 
-type EditHistoryDialogType = {
+type InspectEventDialogContextType = {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   toggleOpen: (event: EventType) => void;
 };
 
-const EditHistoryDialogContext = createContext<EditHistoryDialogType | null>(
-  null,
-);
+const InspectEventDialogContext =
+  createContext<InspectEventDialogContextType | null>(null);
 
-export function EditHistoryDialogProvider({
+export function InspectEventDialogProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { setEvent } = useSelectedEvent();
   const [isOpen, setIsOpen] = useState(false);
+  const { setEvent } = useSelectedEvent();
 
   const toggleOpen = (someEvent: EventType) => {
     setEvent(someEvent);
@@ -37,21 +36,25 @@ export function EditHistoryDialogProvider({
   };
 
   return (
-    <EditHistoryDialogContext.Provider
-      value={{ isOpen, setIsOpen, toggleOpen }}
+    <InspectEventDialogContext.Provider
+      value={{
+        isOpen,
+        setIsOpen,
+        toggleOpen,
+      }}
     >
-      <EditHistoryDialog />
+      <InspectEventDialog />
       {children}
-    </EditHistoryDialogContext.Provider>
+    </InspectEventDialogContext.Provider>
   );
 }
 
-export function useEditHistoryDialog() {
-  const context = use(EditHistoryDialogContext);
+export function useInspectEventDialog() {
+  const context = use(InspectEventDialogContext);
 
   if (!context) {
     throw new Error(
-      "useEditHistoryDialog must be used within a EditHistoryDialogProvider",
+      "useInspectEventDialog must be used within a InspectEventDialogProvider",
     );
   }
 
