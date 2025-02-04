@@ -4,6 +4,7 @@ import { useEditHistoryDialog } from "~/context/edit-history-dialog-context";
 import { useSelectedEvent } from "~/context/selected-event-context";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { ScrollArea } from "../ui/scroll-area";
 
 import EditHistoryEventForm from "./edit-history-event-form";
 
@@ -16,10 +17,12 @@ export default function EditHistoryDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="w-full max-w-3xl">
-        <DialogHeader>
-          <DialogTitle>Edit History Event</DialogTitle>
-        </DialogHeader>
-        <EditHistoryEventForm />
+        <ScrollArea className="max-h-screen">
+          <DialogHeader>
+            <DialogTitle>Edit History Event</DialogTitle>
+          </DialogHeader>
+          <EditHistoryEventForm />
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );

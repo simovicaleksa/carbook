@@ -8,10 +8,7 @@ import {
   useState,
 } from "react";
 
-import InspectEventDialog from "~/components/history/inspect-event-dialog";
-
 import { type EventType } from "./events-context";
-import { useSelectedEvent } from "./selected-event-context";
 
 type InspectEventDialogContextType = {
   isOpen: boolean;
@@ -28,10 +25,8 @@ export function InspectEventDialogProvider({
   children: React.ReactNode;
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const { setEvent } = useSelectedEvent();
 
-  const toggleOpen = (someEvent: EventType) => {
-    setEvent(someEvent);
+  const toggleOpen = () => {
     setIsOpen((prev) => !prev);
   };
 
@@ -43,7 +38,6 @@ export function InspectEventDialogProvider({
         toggleOpen,
       }}
     >
-      <InspectEventDialog />
       {children}
     </InspectEventDialogContext.Provider>
   );

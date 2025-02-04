@@ -156,14 +156,18 @@ export default function AddHistoryEventForm() {
               <FormItem className="col-span-full">
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea {...field} placeholder="Changed oil filters..." />
+                  <Textarea
+                    {...field}
+                    placeholder="Changed oil filters..."
+                    className="min-h-[220px]"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          <AlertDialogFooter className="col-span-full">
+          <AlertDialogFooter className="col-span-full gap-2 sm:gap-2 sm:space-x-0">
             <AlertDialogCancel asChild>
               <Button variant={"outline"} type="button">
                 Cancel

@@ -12,6 +12,7 @@ import { updateVehicleHistoryEvent } from "~/app/dashboard/history/actions";
 import { cn } from "~/lib/utils";
 
 import { useEditHistoryDialog } from "~/context/edit-history-dialog-context";
+import { useInspectEventDialog } from "~/context/inspect-event-dialog-context";
 import { useSelectedEvent } from "~/context/selected-event-context";
 
 import { useLoading } from "~/hooks/use-loading";
@@ -38,10 +39,17 @@ export default function EditHistoryEventForm() {
   const loading = useLoading();
   const isMobile = useIsMobile();
   const router = useRouter();
+  const { setIsOpen: setInspectDialogIsOpen } = useInspectEventDialog();
   const { setIsOpen } = useEditHistoryDialog();
   const { event } = useSelectedEvent();
 
   const handleCancel = () => setIsOpen(false);
+
+  function onEventUpdate() {
+    setIsOpen(false);
+    setInspectDialogIsOpen(false);
+    router.refresh();
+  }
 
   async function onSubmit(values: z.infer<typeof addHistoryEventSchema>) {
     if (!event?.id) return;
@@ -58,8 +66,7 @@ export default function EditHistoryEventForm() {
       toast.success("Success", {
         description: "Event successfully added to vehicle history",
       });
-      setIsOpen(false);
-      router.refresh();
+      onEventUpdate();
     }
 
     loading.end();
@@ -158,14 +165,18 @@ export default function EditHistoryEventForm() {
               <FormItem className="col-span-full">
                 <FormLabel>Description</FormLabel>
                 <FormControl>
-                  <Textarea {...field} placeholder="Changed oil filters..." />
+                  <Textarea
+                    {...field}
+                    placeholder="Changed oil filters..."
+                    className="min-h-[220px]"
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
 
-          <DialogFooter className="col-span-full">
+          <DialogFooter className="col-span-full gap-2 sm:gap-2 sm:space-x-0">
             <Button variant={"outline"} type="button" onClick={handleCancel}>
               Cancel
             </Button>

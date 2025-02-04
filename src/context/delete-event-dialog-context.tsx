@@ -8,17 +8,16 @@ import {
   useState,
 } from "react";
 
-type EditHistoryDialogType = {
+type DeleteEventDialogContextType = {
   isOpen: boolean;
   setIsOpen: Dispatch<SetStateAction<boolean>>;
   toggleOpen: () => void;
 };
 
-const EditHistoryDialogContext = createContext<EditHistoryDialogType | null>(
-  null,
-);
+const DeleteEventDialogContext =
+  createContext<DeleteEventDialogContextType | null>(null);
 
-export function EditHistoryDialogProvider({
+export function DeleteEventDialogProvider({
   children,
 }: {
   children: React.ReactNode;
@@ -28,20 +27,20 @@ export function EditHistoryDialogProvider({
   const toggleOpen = () => setIsOpen((prev) => !prev);
 
   return (
-    <EditHistoryDialogContext.Provider
+    <DeleteEventDialogContext.Provider
       value={{ isOpen, setIsOpen, toggleOpen }}
     >
       {children}
-    </EditHistoryDialogContext.Provider>
+    </DeleteEventDialogContext.Provider>
   );
 }
 
-export function useEditHistoryDialog() {
-  const context = use(EditHistoryDialogContext);
+export function useDeleteEventDialog() {
+  const context = use(DeleteEventDialogContext);
 
   if (!context) {
     throw new Error(
-      "useEditHistoryDialog must be used within a EditHistoryDialogProvider",
+      "useDeleteEventDialog must be used within a DeleteEventDialogProvider",
     );
   }
 
