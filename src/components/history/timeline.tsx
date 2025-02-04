@@ -73,7 +73,7 @@ export function TimelineItem({
       </div>
       <div className="group relative mr-5 w-full duration-200 ease-out lg:mr-0">
         <button className="w-full text-start" onClick={handleInspect}>
-          <Card className="cursor-pointer shadow-xl">
+          <Card className="cursor-pointer shadow-xl duration-200 hover:bg-secondary/50">
             <CardContent className="px-0">
               <CardHeader>
                 <CardTitle className="mb-2 capitalize">{event.type}</CardTitle>
