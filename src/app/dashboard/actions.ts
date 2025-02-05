@@ -18,7 +18,7 @@ import {
   updateVehicle,
 } from "~/lib/server/vehicle";
 import { NotFoundError } from "~/lib/utils/error";
-import { responseError } from "~/lib/utils/response";
+import { responseError, responseSuccess } from "~/lib/utils/response";
 
 import { addVehicleSchema } from "../actions/vehicle-validators";
 
@@ -28,11 +28,7 @@ export async function getUserVehicles() {
 
     const userVehicles = await getVehiclesFromUserId(user.id);
 
-    return {
-      ok: true,
-      status: 200,
-      data: userVehicles,
-    };
+    return responseSuccess(userVehicles);
   } catch (error) {
     return responseError(error);
   }
@@ -65,10 +61,7 @@ export async function createUserVehicle(
       })
       .where(eq(userProfileTable.userId, user.id));
 
-    return {
-      ok: true,
-      status: 200,
-    };
+    return responseSuccess();
   } catch (error) {
     return responseError(error);
   }
@@ -91,11 +84,7 @@ export async function selectUserVehicle(vehicleId: string) {
       })
       .where(eq(userProfileTable.userId, user.id));
 
-    return {
-      ok: true,
-      status: 200,
-      data: vehicle,
-    };
+    return responseSuccess(vehicle);
   } catch (error) {
     return responseError(error);
   }
@@ -112,11 +101,7 @@ export async function getCurrentSelectedVehicle() {
       },
     });
 
-    return {
-      ok: true,
-      status: 200,
-      data: userProfile?.selectedVehicle,
-    };
+    return responseSuccess(userProfile?.selectedVehicle);
   } catch (error) {
     return responseError(error);
   }
@@ -133,11 +118,7 @@ export async function getUserSelectedVehicle(userId: string) {
       },
     });
 
-    return {
-      ok: true,
-      status: 200,
-      data: userProfile?.selectedVehicle,
-    };
+    return responseSuccess(userProfile?.selectedVehicle);
   } catch (error) {
     return responseError(error);
   }
@@ -153,10 +134,7 @@ export async function updateUserSelectedVehicle(vehicleId: string) {
 
     await updateUserProfileSelectedVehicle(user.id, vehicleId);
 
-    return {
-      ok: true,
-      status: 200,
-    };
+    return responseSuccess();
   } catch (error) {
     return responseError(error);
   }
@@ -177,10 +155,7 @@ export async function updateUserVehicle(
 
     await updateVehicle(vehicleId, newVehicle);
 
-    return {
-      ok: true,
-      status: 200,
-    };
+    return responseSuccess();
   } catch (error) {
     return responseError(error);
   }

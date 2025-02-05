@@ -16,7 +16,7 @@ import {
   updateHistoryEvent,
 } from "~/lib/server/history";
 import { NotFoundError, UserInputError } from "~/lib/utils/error";
-import { responseError } from "~/lib/utils/response";
+import { responseError, responseSuccess } from "~/lib/utils/response";
 
 export async function createUserHistoryEvent(
   vehicleId: string,
@@ -96,10 +96,7 @@ export async function createUserHistoryEvent(
 
     await createHistoryEvent(vehicleId, newEvent);
 
-    return {
-      ok: true,
-      status: 200,
-    };
+    return responseSuccess();
   } catch (error) {
     return responseError(error);
   }
@@ -119,11 +116,7 @@ export async function getVehicleHistoryEvents(vehicleId: string) {
 
     const events = await getHistoryEvents(vehicleId);
 
-    return {
-      ok: true,
-      status: 200,
-      data: events,
-    };
+    return responseSuccess(events);
   } catch (error) {
     return responseError(error);
   }
@@ -189,11 +182,7 @@ export async function updateVehicleHistoryEvent(
 
     await updateHistoryEvent(eventId, newEvent);
 
-    return {
-      ok: true,
-      status: 200,
-      data: newEvent,
-    };
+    return responseSuccess(newEvent);
   } catch (error) {
     return responseError(error);
   }
@@ -216,10 +205,7 @@ export async function deleteVehicleHistoryEvent(eventId: number) {
 
     await deleteHistoryEvent(eventId);
 
-    return {
-      ok: true,
-      status: 200,
-    };
+    return responseSuccess();
   } catch (error) {
     return responseError(error);
   }
