@@ -33,6 +33,7 @@ export default function VehicleSwitcher() {
   const { toggleOpen } = useAddVehicleDialog();
   const { vehicles } = useUserVehicles();
   const { selectedVehicle, changeSelectedVehicle } = useSelectedVehicle();
+  const Icon = getBrandIcon(selectedVehicle);
 
   const handleVehicleChange = async (vehicle: VehicleType) => {
     await changeSelectedVehicle(vehicle);
@@ -45,7 +46,7 @@ export default function VehicleSwitcher() {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton size={"lg"}>
               <div className="flex size-8 flex-row items-center justify-center rounded-[var(--radius)] bg-sidebar-primary text-sidebar-primary-foreground">
-                {getBrandIcon(selectedVehicle)}
+                <Icon />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-normal">
@@ -86,7 +87,7 @@ export default function VehicleSwitcher() {
                     },
                   )}
                 >
-                  {getBrandIcon(vehicle)}
+                  <Icon />
                 </div>
 
                 <div className="grid flex-1 text-left text-sm leading-tight">
