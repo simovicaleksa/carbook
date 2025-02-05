@@ -69,109 +69,103 @@ export default function AddVehicleForm() {
   });
 
   return (
-    <div>
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className={cn("grid grid-cols-2 gap-2 space-y-5", {
-            "grid-cols-1": isMobile,
-          })}
-        >
-          <FormField
-            control={form.control}
-            name="type"
-            render={({ field }) => (
-              <FormItem className="col-span-full">
-                <FormLabel>Type</FormLabel>
-                <FormControl>
-                  <VehicleTypeRadio
-                    onValueChange={field.onChange}
-                    value={field.value}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="make"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Make</FormLabel>
-                <FormControl>
-                  <MakeSelect
-                    onValueChange={field.onChange}
-                    value={field.value}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="model"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Model</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Vehicle model..." />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="year"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Year</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="Vehicle year..."
-                    type="number"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="distanceTraveled"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Distance traveled</FormLabel>
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="Distance traveled..."
-                    type="number"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <AlertDialogFooter className="col-span-full">
-            <AlertDialogCancel asChild>
-              <Button variant={"outline"} type="button">
-                Cancel
-              </Button>
-            </AlertDialogCancel>
-            <LoadingButton
-              isLoading={loading.isLoading}
-              type="submit"
-              loadingText="Adding vehicle"
-            >
-              Add vehicle
-            </LoadingButton>
-          </AlertDialogFooter>
-        </form>
-      </Form>
-    </div>
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className={cn("grid grid-cols-2 gap-2 space-y-5", {
+          "grid-cols-1": isMobile,
+        })}
+      >
+        <FormField
+          control={form.control}
+          name="type"
+          render={({ field }) => (
+            <FormItem className="col-span-full">
+              <FormLabel>Type</FormLabel>
+              <FormControl>
+                <VehicleTypeRadio
+                  onValueChange={field.onChange}
+                  value={field.value}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="make"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Make</FormLabel>
+              <FormControl>
+                <MakeSelect
+                  onValueChange={field.onChange}
+                  value={field.value}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="model"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Model</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Vehicle model..." />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="year"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Year</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Vehicle year..." type="number" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="distanceTraveled"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Distance traveled</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  placeholder="Distance traveled..."
+                  type="number"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <AlertDialogFooter className="col-span-full">
+          <AlertDialogCancel asChild>
+            <Button variant={"outline"} type="button">
+              Cancel
+            </Button>
+          </AlertDialogCancel>
+          <LoadingButton
+            isLoading={loading.isLoading}
+            type="submit"
+            loadingText="Adding vehicle"
+          >
+            Add vehicle
+          </LoadingButton>
+        </AlertDialogFooter>
+      </form>
+    </Form>
   );
 }
