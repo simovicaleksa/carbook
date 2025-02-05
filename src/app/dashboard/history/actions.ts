@@ -1,20 +1,22 @@
 "use server";
 
 import { and, desc, eq, gt, lt } from "drizzle-orm";
-import { ZodError, type z } from "zod";
+import { type z } from "zod";
 
 import { addHistoryEventSchema } from "~/app/actions/history-validators";
 
 import { db } from "~/db";
 import { historyTable, vehicleTable } from "~/db/_schema";
 
-import { AuthorizationError, authorize } from "~/lib/server/authorize";
+import { authorize } from "~/lib/server/authorize";
 import {
   createHistoryEvent,
   deleteHistoryEvent,
   getHistoryEvents,
   updateHistoryEvent,
 } from "~/lib/server/history";
+import { NotFoundError, UserInputError } from "~/lib/utils/error";
+import { responseError } from "~/lib/utils/response";
 
 export async function createUserHistoryEvent(
   vehicleId: string,
@@ -50,11 +52,9 @@ export async function createUserHistoryEvent(
       .limit(1);
 
     if (precedingConflict.length > 0) {
-      return {
-        ok: false,
-        status: 400,
-        error: new Error("Older entry with higher distance traveled exists"),
-      };
+      throw new UserInputError(
+        "Older entry with higher distance traveled exists",
+      );
     }
 
     // Check for upcoming events with lower distance traveled
@@ -71,11 +71,9 @@ export async function createUserHistoryEvent(
       .limit(1);
 
     if (upcomingConflict.length > 0) {
-      return {
-        ok: false,
-        status: 400,
-        error: new Error("Newer entry with lower distance traveled exists"),
-      };
+      throw new UserInputError(
+        "Newer entry with lower distance traveled exists",
+      );
     }
 
     const latestEvent = await db.query.historyTable.findFirst({
@@ -103,23 +101,7 @@ export async function createUserHistoryEvent(
       status: 200,
     };
   } catch (error) {
-    if (error instanceof AuthorizationError)
-      return {
-        ok: false,
-        status: 401,
-        error: error,
-      };
-    if (error instanceof ZodError)
-      return {
-        ok: false,
-        status: 400,
-        error: error,
-      };
-    return {
-      ok: false,
-      status: 500,
-      error: error as Error,
-    };
+    return responseError(error);
   }
 }
 
@@ -143,17 +125,7 @@ export async function getVehicleHistoryEvents(vehicleId: string) {
       data: events,
     };
   } catch (error) {
-    if (error instanceof AuthorizationError)
-      return {
-        ok: false,
-        status: 401,
-        error: error,
-      };
-    return {
-      ok: false,
-      status: 500,
-      error: error as Error,
-    };
+    return responseError(error);
   }
 }
 
@@ -170,13 +142,7 @@ export async function updateVehicleHistoryEvent(
       },
     });
 
-    if (!event) {
-      return {
-        ok: false,
-        status: 404,
-        error: new Error("Event not found"),
-      };
-    }
+    if (!event) throw new NotFoundError("Event not found");
 
     await authorize(async (user) => {
       if (event.vehicle.ownerId !== user.id) return false;
@@ -197,11 +163,9 @@ export async function updateVehicleHistoryEvent(
       .limit(1);
 
     if (precedingConflict.length > 0) {
-      return {
-        ok: false,
-        status: 400,
-        error: new Error("Older entry with higher distance traveled exists"),
-      };
+      throw new UserInputError(
+        "Older entry with higher distance traveled exists",
+      );
     }
 
     // Check for upcoming events with lower distance traveled
@@ -218,11 +182,9 @@ export async function updateVehicleHistoryEvent(
       .limit(1);
 
     if (upcomingConflict.length > 0) {
-      return {
-        ok: false,
-        status: 400,
-        error: new Error("Newer entry with lower distance traveled exists"),
-      };
+      throw new UserInputError(
+        "Newer entry with lower distance traveled exists",
+      );
     }
 
     await updateHistoryEvent(eventId, newEvent);
@@ -233,23 +195,7 @@ export async function updateVehicleHistoryEvent(
       data: newEvent,
     };
   } catch (error) {
-    if (error instanceof AuthorizationError)
-      return {
-        ok: false,
-        status: 401,
-        error: error,
-      };
-    if (error instanceof ZodError)
-      return {
-        ok: false,
-        status: 400,
-        error: error,
-      };
-    return {
-      ok: false,
-      status: 500,
-      error: error as Error,
-    };
+    return responseError(error);
   }
 }
 
@@ -275,16 +221,6 @@ export async function deleteVehicleHistoryEvent(eventId: number) {
       status: 200,
     };
   } catch (error) {
-    if (error instanceof AuthorizationError)
-      return {
-        ok: false,
-        status: 401,
-        error: error,
-      };
-    return {
-      ok: false,
-      status: 500,
-      error: error as Error,
-    };
+    return responseError(error);
   }
 }

@@ -1,3 +1,5 @@
+import { AuthorizationError } from "../utils/error";
+
 import { getCurrentSession, type User } from "./auth";
 
 export async function authorize(
@@ -20,11 +22,4 @@ export async function authorize(
   }
 
   return user;
-}
-
-export class AuthorizationError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "AuthorizationError";
-  }
 }

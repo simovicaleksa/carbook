@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 
-import { ZodError, type z } from "zod";
+import { type z } from "zod";
 
 import {
   createSession,
@@ -11,6 +11,8 @@ import {
 } from "~/lib/server/auth";
 import { verifyPasswordHash } from "~/lib/server/password";
 import { getUserFromUsernameOrEmail } from "~/lib/server/user";
+import { UserInputError } from "~/lib/utils/error";
+import { responseError } from "~/lib/utils/response";
 
 import { loginSchema } from "./validators";
 
@@ -24,11 +26,12 @@ export async function login({
     const user = await getUserFromUsernameOrEmail(parsedUser.username);
 
     if (!user) {
-      return {
-        ok: false,
-        status: 401,
-        error: new Error("Invalid username or password"),
-      };
+      throw new UserInputError("Invalid username or password");
+      // return {
+      //   ok: false,
+      //   status: 401,
+      //   error: new Error("Invalid username or password"),
+      // };
     }
 
     const passwordsMatch = await verifyPasswordHash(user.password, password);
@@ -45,19 +48,7 @@ export async function login({
     const session = await createSession(sessionToken, user.id);
     await setSessionTokenCookie(sessionToken, session.expiresAt);
   } catch (error) {
-    if (error instanceof ZodError) {
-      return {
-        ok: false,
-        status: 400,
-        error: error,
-      };
-    }
-
-    return {
-      ok: false,
-      status: 500,
-      error: error as Error,
-    };
+    return responseError(error);
   }
 
   return redirect("/welcome/login");

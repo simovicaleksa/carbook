@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 
-import { ZodError, type z } from "zod";
+import { type z } from "zod";
 
 import {
   createSession,
@@ -10,6 +10,7 @@ import {
   setSessionTokenCookie,
 } from "~/lib/server/auth";
 import { createUser } from "~/lib/server/user";
+import { responseError } from "~/lib/utils/response";
 
 import { signupSchema } from "./validators";
 
@@ -23,19 +24,7 @@ export async function signUp(signupUser: z.infer<typeof signupSchema>) {
     const session = await createSession(sessionToken, user.id);
     await setSessionTokenCookie(sessionToken, session.expiresAt);
   } catch (error) {
-    if (error instanceof ZodError) {
-      return {
-        ok: false,
-        status: 400,
-        error: error,
-      };
-    }
-
-    return {
-      ok: false,
-      status: 500,
-      error: error as Error,
-    };
+    return responseError(error);
   }
 
   redirect("/welcome/signup");

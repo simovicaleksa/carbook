@@ -7,6 +7,7 @@ import {
   getCurrentSession,
   invalidateSession,
 } from "~/lib/server/auth";
+import { responseError } from "~/lib/utils/response";
 
 export async function signout() {
   try {
@@ -19,11 +20,7 @@ export async function signout() {
     await invalidateSession(session.id);
     await deleteSessionTokenCookie();
   } catch (error) {
-    return {
-      ok: false,
-      status: 401,
-      error: error as Error,
-    };
+    return responseError(error);
   }
 
   return redirect("/auth/login");

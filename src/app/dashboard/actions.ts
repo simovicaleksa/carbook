@@ -1,12 +1,12 @@
 "use server";
 
 import { eq } from "drizzle-orm";
-import { type z, ZodError } from "zod";
+import { type z } from "zod";
 
 import { db } from "~/db";
 import { userProfileTable } from "~/db/_schema";
 
-import { AuthorizationError, authorize } from "~/lib/server/authorize";
+import { authorize } from "~/lib/server/authorize";
 import {
   getUserProfileFromUserId,
   updateUserProfileSelectedVehicle,
@@ -15,7 +15,10 @@ import {
   createVehicle,
   getVehicleFromId,
   getVehiclesFromUserId,
+  updateVehicle,
 } from "~/lib/server/vehicle";
+import { NotFoundError } from "~/lib/utils/error";
+import { responseError } from "~/lib/utils/response";
 
 import { addVehicleSchema } from "../actions/vehicle-validators";
 
@@ -31,19 +34,7 @@ export async function getUserVehicles() {
       data: userVehicles,
     };
   } catch (error) {
-    if (error instanceof AuthorizationError) {
-      return {
-        ok: false,
-        status: 401,
-        error: error,
-      };
-    }
-
-    return {
-      ok: false,
-      status: 500,
-      error: error as Error,
-    };
+    return responseError(error);
   }
 }
 
@@ -79,23 +70,7 @@ export async function createUserVehicle(
       status: 200,
     };
   } catch (error) {
-    if (error instanceof ZodError)
-      return {
-        ok: false,
-        status: 400,
-        error: error,
-      };
-    else if (error instanceof AuthorizationError)
-      return {
-        ok: false,
-        status: 401,
-        error: error,
-      };
-    return {
-      ok: false,
-      status: 500,
-      error: error as Error,
-    };
+    return responseError(error);
   }
 }
 
@@ -103,12 +78,7 @@ export async function selectUserVehicle(vehicleId: string) {
   try {
     const vehicle = await getVehicleFromId(vehicleId);
 
-    if (!vehicle)
-      return {
-        ok: false,
-        status: 404,
-        error: new Error("Vehicle not found"),
-      };
+    if (!vehicle) throw new NotFoundError("Vehicle not found");
 
     const user = await authorize((user) => {
       return vehicle.ownerId === user.id;
@@ -127,17 +97,7 @@ export async function selectUserVehicle(vehicleId: string) {
       data: vehicle,
     };
   } catch (error) {
-    if (error instanceof AuthorizationError)
-      return {
-        ok: false,
-        status: 401,
-        error: error,
-      };
-    return {
-      ok: false,
-      status: 500,
-      error: error as Error,
-    };
+    return responseError(error);
   }
 }
 
@@ -158,17 +118,7 @@ export async function getCurrentSelectedVehicle() {
       data: userProfile?.selectedVehicle,
     };
   } catch (error) {
-    if (error instanceof AuthorizationError)
-      return {
-        ok: false,
-        status: 401,
-        error: error,
-      };
-    return {
-      ok: false,
-      status: 500,
-      error: error as Error,
-    };
+    return responseError(error);
   }
 }
 
@@ -189,17 +139,7 @@ export async function getUserSelectedVehicle(userId: string) {
       data: userProfile?.selectedVehicle,
     };
   } catch (error) {
-    if (error instanceof AuthorizationError)
-      return {
-        ok: false,
-        status: 401,
-        error: error,
-      };
-    return {
-      ok: false,
-      status: 500,
-      error: error as Error,
-    };
+    return responseError(error);
   }
 }
 
@@ -207,12 +147,7 @@ export async function updateUserSelectedVehicle(vehicleId: string) {
   try {
     const vehicle = await getVehicleFromId(vehicleId);
 
-    if (!vehicle)
-      return {
-        ok: false,
-        status: 404,
-        error: new Error("Vehicle not found"),
-      };
+    if (!vehicle) throw new NotFoundError("Vehicle not found");
 
     const user = await authorize((user) => vehicle.ownerId === user.id);
 
@@ -223,16 +158,30 @@ export async function updateUserSelectedVehicle(vehicleId: string) {
       status: 200,
     };
   } catch (error) {
-    if (error instanceof AuthorizationError)
-      return {
-        ok: false,
-        status: 401,
-        error: error,
-      };
+    return responseError(error);
+  }
+}
+
+export async function updateUserVehicle(
+  vehicleId: string,
+  newVehicle: z.infer<typeof addVehicleSchema>,
+) {
+  try {
+    addVehicleSchema.parse(newVehicle);
+
+    const vehicle = await getVehicleFromId(vehicleId);
+
+    if (!vehicle) throw new NotFoundError("Vehicle not found");
+
+    await authorize((user) => vehicle.ownerId === user.id);
+
+    await updateVehicle(vehicleId, newVehicle);
+
     return {
-      ok: false,
-      status: 500,
-      error: error as Error,
+      ok: true,
+      status: 200,
     };
+  } catch (error) {
+    return responseError(error);
   }
 }
