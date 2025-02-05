@@ -74,7 +74,7 @@ export const sessionTable = pgTable("sessions", {
 
 export const vehicleTable = pgTable("vehicles", {
   id: uuid("id").primaryKey().defaultRandom(),
-  type: text("type", { enum: ["car", "motorcycle", "truck"] }).notNull(),
+  type: text("type", { enum: ["car", "motorcycle", "truck", "van"] }).notNull(),
   make: varchar("make", { length: 255 }).notNull(),
   model: varchar("model", { length: 255 }).notNull(),
   year: integer("year").notNull(),

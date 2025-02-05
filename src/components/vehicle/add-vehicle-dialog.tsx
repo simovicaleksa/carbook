@@ -9,6 +9,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../ui/alert-dialog";
+import { ScrollArea } from "../ui/scroll-area";
 
 import AddVehicleForm from "./add-vehicle-form";
 
@@ -17,14 +18,18 @@ export default function AddVehicleDialog() {
 
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Add vehicle</AlertDialogTitle>
-          <AlertDialogDescription>
-            Add a new vehicle to your account
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AddVehicleForm />
+      <AlertDialogContent className="max-w-2xl p-0">
+        <ScrollArea className="max-h-screen">
+          <AlertDialogHeader className="p-5">
+            <AlertDialogTitle>Add vehicle</AlertDialogTitle>
+            <AlertDialogDescription>
+              Add a new vehicle to your account
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="p-5">
+            <AddVehicleForm />
+          </div>
+        </ScrollArea>
       </AlertDialogContent>
     </AlertDialog>
   );

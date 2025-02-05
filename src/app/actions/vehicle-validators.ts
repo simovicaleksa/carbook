@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const addVehicleSchema = z.object({
-  type: z.enum(["car", "motorcycle", "truck"], {
+  type: z.enum(["car", "motorcycle", "truck", "van"], {
     message: "Invalid vehicle type",
   }),
   make: z.string().min(1, { message: "Make is required" }),

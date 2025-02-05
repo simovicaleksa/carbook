@@ -1,4 +1,7 @@
 import { eq } from "drizzle-orm";
+import { type z } from "zod";
+
+import { type addVehicleSchema } from "~/app/actions/vehicle-validators";
 
 import { db } from "~/db";
 import { userProfileTable, vehicleTable } from "~/db/_schema";
@@ -27,13 +30,7 @@ export async function createVehicle(
     year,
     distanceTraveled,
     type,
-  }: {
-    make: string;
-    model: string;
-    year: number;
-    type: "motorcycle" | "car" | "truck";
-    distanceTraveled: number;
-  },
+  }: z.infer<typeof addVehicleSchema>,
 ) {
   const [vehicle] = await db
     .insert(vehicleTable)
@@ -56,14 +53,7 @@ export async function createVehicle(
 
 export async function updateVehicle(
   vehicleId: string,
-  newVehicle: {
-    userId?: string;
-    make?: string;
-    model?: string;
-    year?: number;
-    type?: "motorcycle" | "car" | "truck";
-    distanceTraveled?: number;
-  },
+  newVehicle: Partial<z.infer<typeof addVehicleSchema>>,
 ) {
   const vehicle = await getVehicleFromId(vehicleId);
 

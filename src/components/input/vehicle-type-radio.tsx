@@ -1,7 +1,7 @@
 import React from "react";
 
 import * as RadioGroup from "@radix-ui/react-radio-group";
-import { Bike, Car, CircleCheck, Truck } from "lucide-react";
+import { Bike, Bus, Car, CircleCheck, Truck } from "lucide-react";
 
 import { cn } from "~/lib/utils";
 
@@ -24,6 +24,12 @@ const options = [
     icon: <Truck className="mb-2.5 text-muted-foreground" />,
     description: "Cargo hauler",
   },
+  {
+    value: "van",
+    label: "Van",
+    icon: <Bus className="mb-2.5 text-muted-foreground" />,
+    description: "Multi-purpose",
+  },
 ];
 
 export default function VehicleTypeRadio({
@@ -32,7 +38,7 @@ export default function VehicleTypeRadio({
 }: RadioGroup.RadioGroupProps) {
   return (
     <RadioGroup.Root
-      className={cn("grid w-full max-w-md grid-cols-3 gap-4", className)}
+      className={cn("grid w-full grid-cols-2 gap-4 sm:grid-cols-4", className)}
       {...rest}
     >
       {options.map((option) => (
