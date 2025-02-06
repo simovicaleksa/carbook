@@ -90,7 +90,7 @@ export default function CarInformationForm() {
   }
 
   return (
-    <Card className="w-full max-w-2xl">
+    <Card className="w-full max-w-3xl">
       <CardHeader>
         <CardTitle>Car information</CardTitle>
         <CardDescription>Update car information</CardDescription>

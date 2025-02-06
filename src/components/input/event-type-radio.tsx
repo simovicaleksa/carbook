@@ -51,9 +51,7 @@ function EventTypeRadioItem({
       <CircleCheck className="absolute right-0 top-0 h-6 w-6 -translate-y-1/2 translate-x-1/2 fill-primary stroke-background text-primary group-data-[state=unchecked]:hidden" />
 
       <Icon className="mb-2 size-7 text-muted-foreground sm:size-5" />
-      <span className="text-sm font-semibold tracking-tight">
-        {option.label}
-      </span>
+      <span className="text-sm font-medium tracking-tight">{option.label}</span>
     </RadioGroup.Item>
   );
 }

@@ -18,5 +18,5 @@ export function AppLayoutHeader({
 }
 
 export function AppLayoutContent({ children }: { children?: React.ReactNode }) {
-  return <div className="p-5">{children}</div>;
+  return <div className="p-5 xl:p-10">{children}</div>;
 }
