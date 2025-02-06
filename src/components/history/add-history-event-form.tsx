@@ -159,7 +159,7 @@ export default function AddHistoryEventForm() {
                   <Textarea
                     {...field}
                     placeholder="Changed oil filters..."
-                    className="min-h-[220px]"
+                    className="min-h-[180px] font-mono !text-lg"
                   />
                 </FormControl>
                 <FormMessage />

@@ -7,6 +7,7 @@ import { db } from "~/db";
 import { userProfileTable } from "~/db/_schema";
 
 import { authorize } from "~/lib/server/authorize";
+import { getLatestHistoryEvent } from "~/lib/server/history";
 import {
   getUserProfileFromUserId,
   updateUserProfileSelectedVehicle,
@@ -17,7 +18,7 @@ import {
   getVehiclesFromUserId,
   updateVehicle,
 } from "~/lib/server/vehicle";
-import { NotFoundError } from "~/lib/utils/error";
+import { NotFoundError, UserInputError } from "~/lib/utils/error";
 import { responseError, responseSuccess } from "~/lib/utils/response";
 
 import { addVehicleSchema } from "../actions/vehicle-validators";
@@ -152,6 +153,17 @@ export async function updateUserVehicle(
     if (!vehicle) throw new NotFoundError("Vehicle not found");
 
     await authorize((user) => vehicle.ownerId === user.id);
+
+    const latestEvent = await getLatestHistoryEvent(vehicleId);
+
+    if (
+      latestEvent &&
+      latestEvent?.atDistanceTraveled > newVehicle.distanceTraveled
+    ) {
+      throw new UserInputError(
+        "Distance traveled is lower than the latest event",
+      );
+    }
 
     await updateVehicle(vehicleId, newVehicle);
 

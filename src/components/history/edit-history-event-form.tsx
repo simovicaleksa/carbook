@@ -3,11 +3,14 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { type InferSelectModel } from "drizzle-orm";
 import { toast } from "sonner";
 import { type z } from "zod";
 
 import { addHistoryEventSchema } from "~/app/actions/history-validators";
 import { updateVehicleHistoryEvent } from "~/app/dashboard/history/actions";
+
+import { type historyTable } from "~/db/_schema";
 
 import { cn } from "~/lib/utils";
 
@@ -39,16 +42,19 @@ export default function EditHistoryEventForm() {
   const loading = useLoading();
   const isMobile = useIsMobile();
   const router = useRouter();
-  const { setIsOpen: setInspectDialogIsOpen } = useInspectEventDialog();
   const { setIsOpen } = useEditHistoryDialog();
-  const { event } = useSelectedEvent();
+  const { setIsOpen: setInspectDialogIsOpen } = useInspectEventDialog();
+  const { event, setEvent } = useSelectedEvent();
 
   const handleCancel = () => setIsOpen(false);
 
-  function onEventUpdate() {
-    setIsOpen(false);
-    setInspectDialogIsOpen(false);
+  function onEventUpdate(updatedEvent: InferSelectModel<typeof historyTable>) {
     router.refresh();
+
+    setIsOpen(false);
+
+    if (!updatedEvent) setInspectDialogIsOpen(false);
+    else setEvent(updatedEvent);
   }
 
   async function onSubmit(values: z.infer<typeof addHistoryEventSchema>) {
@@ -66,7 +72,7 @@ export default function EditHistoryEventForm() {
       toast.success("Success", {
         description: "Event successfully added to vehicle history",
       });
-      onEventUpdate();
+      if (res.data) onEventUpdate(res.data);
     }
 
     loading.end();
@@ -168,7 +174,7 @@ export default function EditHistoryEventForm() {
                   <Textarea
                     {...field}
                     placeholder="Changed oil filters..."
-                    className="min-h-[220px]"
+                    className="min-h-[180px] font-mono !text-lg"
                   />
                 </FormControl>
                 <FormMessage />

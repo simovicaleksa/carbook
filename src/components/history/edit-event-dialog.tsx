@@ -16,7 +16,7 @@ export default function EditHistoryDialog() {
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="w-full max-w-3xl">
+      <DialogContent className="w-full max-w-3xl" overlay="bg-transparent">
         <ScrollArea className="max-h-screen">
           <DialogHeader>
             <DialogTitle>Edit History Event</DialogTitle>

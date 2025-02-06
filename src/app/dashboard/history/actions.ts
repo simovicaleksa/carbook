@@ -180,9 +180,9 @@ export async function updateVehicleHistoryEvent(
       );
     }
 
-    await updateHistoryEvent(eventId, newEvent);
+    const [updatedEvent] = await updateHistoryEvent(eventId, newEvent);
 
-    return responseSuccess(newEvent);
+    return responseSuccess(updatedEvent);
   } catch (error) {
     return responseError(error);
   }

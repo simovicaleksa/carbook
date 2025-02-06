@@ -47,7 +47,7 @@ export default function VehicleTypeRadio({
           value={option.value}
           className={cn(
             "group relative rounded px-3 py-2 text-start ring-[1px] ring-border",
-            "data-[state=checked]:ring-2 data-[state=checked]:ring-primary",
+            "data-[disabled]:opacity-50 data-[state=checked]:ring-2 data-[state=checked]:ring-primary",
           )}
         >
           <CircleCheck className="absolute right-0 top-0 h-6 w-6 -translate-y-1/2 translate-x-1/2 fill-primary stroke-background text-primary group-data-[state=unchecked]:hidden" />
