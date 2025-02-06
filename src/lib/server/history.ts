@@ -29,9 +29,22 @@ export async function updateHistoryEvent(
   eventId: number,
   event: Partial<EventType>,
 ) {
-  await db.update(historyTable).set(event).where(eq(historyTable.id, eventId));
+  return await db
+    .update(historyTable)
+    .set(event)
+    .where(eq(historyTable.id, eventId))
+    .returning();
 }
 
 export async function deleteHistoryEvent(eventId: number) {
   await db.delete(historyTable).where(eq(historyTable.id, eventId));
+}
+
+export async function getLatestHistoryEvent(vehicleId: string) {
+  const event = await db.query.historyTable.findFirst({
+    where: eq(historyTable.vehicleId, vehicleId),
+    orderBy: desc(historyTable.atDistanceTraveled),
+  });
+
+  return event;
 }
