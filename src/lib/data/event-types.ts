@@ -74,4 +74,4 @@ export const eventTypes = [
     label: "Other",
     icon: CircleEllipsis,
   },
-];
+] as const;

@@ -90,4 +90,4 @@ export const makes = [
   { name: "Volkswagen", icon: SiVolkswagen },
   { name: "Volvo", icon: SiVolvo },
   { name: "Other", icon: Car },
-];
+] as const;
