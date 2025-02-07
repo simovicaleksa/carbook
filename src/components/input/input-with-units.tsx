@@ -4,7 +4,8 @@ import { type InputProps } from "react-day-picker";
 import { Input } from "../ui/input";
 
 type InputWithUnitsProps = InputProps & {
-  units?: string;
+  units?: "metric" | "imperial";
+  disabled?: boolean;
 };
 
 export default function InputWithUnits({
@@ -26,9 +27,15 @@ export default function InputWithUnits({
           ref={unitsRef}
           className="absolute right-0 ml-2 flex h-full w-fit items-center justify-center bg-secondary px-3 text-sm text-muted-foreground"
         >
-          {units}
+          {getUnits(units)}
         </span>
       )}
     </div>
   );
+}
+
+function getUnits(units: string) {
+  if (units === "metric") return "km";
+  if (units === "imperial") return "mi";
+  return units;
 }
