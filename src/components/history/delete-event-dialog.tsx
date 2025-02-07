@@ -48,6 +48,7 @@ export default function DeleteEventDialog() {
     setInspectDialogIsOpen(false);
     setIsOpen(false);
     setIsOpen(false);
+    setIsConfirmed(false);
     router.refresh();
   }
 
