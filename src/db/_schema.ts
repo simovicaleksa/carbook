@@ -1,6 +1,5 @@
 import { relations } from "drizzle-orm";
 import {
-  boolean,
   date,
   integer,
   pgTable,
@@ -21,7 +20,6 @@ export const userTable = pgTable("users", {
   role: text("role", { enum: ["user", "admin"] })
     .default("user")
     .notNull(),
-  prefersImperial: boolean("prefers_imperial").default(false).notNull(),
   createdAt: timestamp("created_at", {
     mode: "date",
     precision: 3,
@@ -38,6 +36,12 @@ export const userRelations = relations(userTable, ({ one, many }) => ({
 
 export const userProfileTable = pgTable("user_profiles", {
   id: uuid("id").primaryKey().defaultRandom(),
+  preferredUnits: text("preferred_units", { enum: ["metric", "imperial"] })
+    .notNull()
+    .default("metric"),
+  preferredCurrency: varchar("preferred_currency", { length: 3 })
+    .notNull()
+    .default("USD"),
   userId: uuid("user_id")
     .notNull()
     .references(() => userTable.id, {

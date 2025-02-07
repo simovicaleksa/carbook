@@ -84,3 +84,11 @@ export async function getUserFromUsernameOrEmail(username: string) {
 
   return user;
 }
+
+export async function getUserProfileFromUserId(userId: string) {
+  const user = await db.query.userProfileTable.findFirst({
+    where: eq(userProfileTable.userId, userId),
+  });
+
+  return user;
+}
