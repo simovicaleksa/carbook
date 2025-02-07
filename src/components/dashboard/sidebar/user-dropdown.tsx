@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { ChevronsUpDown, User2 } from "lucide-react";
+import { ChevronsUpDown, LogOut, User2 } from "lucide-react";
 
 import { useSignoutDialog } from "~/context/signout-dialog-context";
 import { useUser } from "~/context/user-context";
@@ -48,13 +48,17 @@ export default function UserDropdown() {
             side="top"
             className="w-[--radix-popper-anchor-width]"
           >
-            <Link href={"/account"}>
+            <Link href={"/dashboard/account"}>
               <DropdownMenuItem>
-                <span>Account</span>
+                <span className="flex flex-row items-center gap-2">
+                  <User2 className="size-4" /> Account
+                </span>
               </DropdownMenuItem>
             </Link>
             <DropdownMenuItem onClick={toggleOpen}>
-              <span className="text-destructive">Sign out</span>
+              <span className="flex flex-row items-center gap-2 text-destructive">
+                <LogOut className="size-4" /> Sign out
+              </span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
