@@ -16,23 +16,14 @@ import { useSelectedVehicle } from "~/context/selected-vehicle-context";
 
 import { useLoading } from "~/hooks/use-loading";
 import { useIsMobile } from "~/hooks/use-mobile";
+import { useUnits } from "~/hooks/use-units";
 
-import EventTypeRadio from "../input/event-type-radio";
-import InputWithUnits from "../input/input-with-units";
 import { AlertDialogCancel, AlertDialogFooter } from "../ui/alert-dialog";
 import { Button } from "../ui/button";
-// import { DatePicker } from "../ui/date-picker";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "../ui/form";
-import { Input } from "../ui/input";
+import { Form } from "../ui/form";
 import LoadingButton from "../ui/loading-button";
-import { Textarea } from "../ui/textarea";
+
+import { UpsertHistoryFormFields } from "./upsert-history-form-fields";
 
 export default function AddHistoryEventForm() {
   const loading = useLoading();
@@ -40,6 +31,7 @@ export default function AddHistoryEventForm() {
   const router = useRouter();
   const { setIsOpen } = useAddHistoryEventDialog();
   const { selectedVehicle } = useSelectedVehicle();
+  const { formatDistance } = useUnits();
 
   async function onSubmit(values: z.infer<typeof addHistoryEventSchema>) {
     if (!selectedVehicle) return;
@@ -69,7 +61,9 @@ export default function AddHistoryEventForm() {
       type: "refuel",
       description: "",
       cost: 0,
-      atDistanceTraveled: selectedVehicle?.distanceTraveled ?? 0,
+      atDistanceTraveled: formatDistance(
+        selectedVehicle?.distanceTraveled ?? 0,
+      ),
       date: new Date(),
     },
   });
@@ -83,89 +77,7 @@ export default function AddHistoryEventForm() {
             "grid-cols-1": isMobile,
           })}
         >
-          <FormField
-            control={form.control}
-            name="type"
-            render={({ field }) => (
-              <FormItem className="col-span-full">
-                <FormLabel>Type</FormLabel>
-                <FormControl>
-                  <EventTypeRadio
-                    onValueChange={field.onChange}
-                    value={field.value}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="cost"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Cost</FormLabel>
-                <FormControl>
-                  <InputWithUnits {...field} units="USD" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="atDistanceTraveled"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>At distance traveled</FormLabel>
-                <FormControl>
-                  <InputWithUnits {...field} units="km" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="date"
-            render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel>Date</FormLabel>
-                <FormControl>
-                  {/* <DatePicker
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    modal
-                  /> */}
-                  <Input
-                    type="date"
-                    value={
-                      field.value ? field.value.toISOString().split("T")[0] : ""
-                    }
-                    onChange={(e) => field.onChange(new Date(e.target.value))}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem className="col-span-full">
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Textarea
-                    {...field}
-                    placeholder="Changed oil filters..."
-                    className="min-h-[180px] font-mono !text-lg"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <UpsertHistoryFormFields form={form} />
 
           <AlertDialogFooter className="col-span-full gap-2 sm:gap-2 sm:space-x-0">
             <AlertDialogCancel asChild>
