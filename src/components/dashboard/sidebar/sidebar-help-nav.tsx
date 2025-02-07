@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 
-import { Flag, LifeBuoy, Send } from "lucide-react";
+import { Flag, HandHeart, Heart, LifeBuoy, Send } from "lucide-react";
 
 import {
   SidebarGroup,
@@ -14,6 +14,11 @@ import {
 import SidebarLinkButton from "./sidebar-link-button";
 
 const helpItems = [
+  {
+    title: "Donate",
+    url: "/donate",
+    icon: <HandHeart />,
+  },
   {
     title: "Support",
     url: "/support",
