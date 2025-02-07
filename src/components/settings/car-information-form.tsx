@@ -15,9 +15,11 @@ import { updateUserVehicle } from "~/app/dashboard/actions";
 import { cn } from "~/lib/utils";
 
 import { useSelectedVehicle } from "~/context/selected-vehicle-context";
+import { useUserProfile } from "~/context/user-profile-context";
 
 import { useLoading } from "~/hooks/use-loading";
 
+import InputWithUnits from "../input/input-with-units";
 import MakeSelect from "../input/make-select";
 import VehicleTypeRadio from "../input/vehicle-type-radio";
 import {
@@ -42,6 +44,7 @@ export default function CarInformationForm() {
   const { selectedVehicle } = useSelectedVehicle();
   const loading = useLoading();
   const router = useRouter();
+  const userProfile = useUserProfile();
 
   const isDisabled = loading.isLoading || !selectedVehicle;
 
@@ -162,7 +165,6 @@ export default function CarInformationForm() {
                     <Input
                       {...field}
                       placeholder="Vehicle year..."
-                      type="number"
                       disabled={isDisabled}
                     />
                   </FormControl>
@@ -177,11 +179,11 @@ export default function CarInformationForm() {
                 <FormItem>
                   <FormLabel>Distance traveled</FormLabel>
                   <FormControl>
-                    <Input
+                    <InputWithUnits
                       {...field}
                       placeholder="Distance traveled..."
-                      type="number"
                       disabled={isDisabled}
+                      units={userProfile.preferredUnits}
                     />
                   </FormControl>
                   <FormMessage />

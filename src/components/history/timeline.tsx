@@ -5,13 +5,16 @@ import { Calendar, Edit, Milestone } from "lucide-react";
 import { cn } from "~/lib/utils";
 import { convertToLocalDateString } from "~/lib/utils/date";
 import { getEventTypeIcon } from "~/lib/utils/icon";
-import { formatNumber } from "~/lib/utils/number";
+import { formatPrice } from "~/lib/utils/money";
 
 import { useEditHistoryDialog } from "~/context/edit-history-dialog-context";
 import { type EventType, useEvents } from "~/context/events-context";
 import { useInspectEventDialog } from "~/context/inspect-event-dialog-context";
 import { useSelectedEvent } from "~/context/selected-event-context";
 
+import { useUnits } from "~/hooks/use-units";
+
+import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import {
   Card,
@@ -48,6 +51,7 @@ export function TimelineItem({
   const { toggleOpen: toggleInspectDialog } = useInspectEventDialog();
   const { setEvent } = useSelectedEvent();
   const Icon = getEventTypeIcon(event.type);
+  const { formatDistanceString } = useUnits();
 
   const handleEdit = () => {
     setEvent(event);
@@ -76,7 +80,14 @@ export function TimelineItem({
           <Card className="cursor-pointer shadow-xl duration-200 hover:bg-secondary/50">
             <CardContent className="px-0">
               <CardHeader>
-                <CardTitle className="mb-2 capitalize">{event.type}</CardTitle>
+                <CardTitle className="mb-2 flex w-full flex-row items-center justify-between capitalize">
+                  <span>{event.type}</span>
+                  {event?.cost?.amount ? (
+                    <Badge className="rounded-md text-base">
+                      {formatPrice(event.cost.amount, event.cost.currency)}
+                    </Badge>
+                  ) : null}
+                </CardTitle>
                 <CardDescription className="flex flex-row gap-5 text-xs font-medium sm:text-sm">
                   <span className="flex flex-row items-center gap-1">
                     <Calendar className="size-4" />
@@ -84,7 +95,7 @@ export function TimelineItem({
                   </span>
                   <span className="flex flex-row items-center gap-1">
                     <Milestone className="size-4" />
-                    {formatNumber(event.atDistanceTraveled)} km
+                    {formatDistanceString(event.atDistanceTraveled)}
                   </span>
                 </CardDescription>
               </CardHeader>
