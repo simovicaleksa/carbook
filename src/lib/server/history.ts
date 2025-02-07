@@ -5,21 +5,27 @@ import { type addHistoryEventSchema } from "~/app/actions/history-validators";
 import { db } from "~/db";
 import { historyTable } from "~/db/_schema";
 
-import { type EventType } from "~/context/events-context";
-
 export async function createHistoryEvent(
   vehicleId: string,
   newEvent: Zod.infer<typeof addHistoryEventSchema>,
 ) {
-  await db.insert(historyTable).values({
-    ...newEvent,
-    vehicleId,
-  });
+  const [insertedEvent] = await db
+    .insert(historyTable)
+    .values({
+      ...newEvent,
+      vehicleId,
+    })
+    .returning();
+
+  return insertedEvent;
 }
 
 export async function getHistoryEvents(vehicleId: string) {
   return await db.query.historyTable.findMany({
     where: eq(historyTable.vehicleId, vehicleId),
+    with: {
+      cost: true,
+    },
     orderBy: desc(historyTable.date),
     limit: 20,
   });
@@ -27,13 +33,18 @@ export async function getHistoryEvents(vehicleId: string) {
 
 export async function updateHistoryEvent(
   eventId: number,
-  event: Partial<EventType>,
+  event: Partial<typeof historyTable.$inferInsert>,
 ) {
-  return await db
-    .update(historyTable)
-    .set(event)
-    .where(eq(historyTable.id, eventId))
-    .returning();
+  await db.update(historyTable).set(event).where(eq(historyTable.id, eventId));
+
+  const updatedEvent = await db.query.historyTable.findFirst({
+    where: eq(historyTable.id, eventId),
+    with: {
+      cost: true,
+    },
+  });
+
+  return updatedEvent;
 }
 
 export async function deleteHistoryEvent(eventId: number) {
