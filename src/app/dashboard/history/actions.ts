@@ -13,17 +13,25 @@ import {
   createHistoryEvent,
   deleteHistoryEvent,
   getHistoryEvents,
+  getLatestHistoryEvent,
   updateHistoryEvent,
 } from "~/lib/server/history";
+import {
+  createPaymentForHistoryEvent,
+  updatePaymentForHistoryEvent,
+} from "~/lib/server/money";
+import { getUserCurrency, getUserUnits } from "~/lib/server/user-profile";
+import { updateVehicle } from "~/lib/server/vehicle";
 import { NotFoundError, UserInputError } from "~/lib/utils/error";
 import { responseError, responseSuccess } from "~/lib/utils/response";
+import { convertToMetric } from "~/lib/utils/units";
 
 export async function createUserHistoryEvent(
   vehicleId: string,
   newEvent: z.infer<typeof addHistoryEventSchema>,
 ) {
   try {
-    await authorize(async (user) => {
+    const user = await authorize(async (user) => {
       const vehicle = await db.query.vehicleTable.findFirst({
         where: and(
           eq(vehicleTable.id, vehicleId),
@@ -38,6 +46,12 @@ export async function createUserHistoryEvent(
 
     addHistoryEventSchema.parse(newEvent);
 
+    const units = await getUserUnits(user.id);
+    const newAtDistanceTraveled = convertToMetric(
+      newEvent.atDistanceTraveled,
+      units,
+    );
+
     // Check for preceding events with higher distance traveled
     const precedingConflict = await db
       .select()
@@ -46,7 +60,7 @@ export async function createUserHistoryEvent(
         and(
           eq(historyTable.vehicleId, vehicleId),
           lt(historyTable.date, newEvent.date),
-          gt(historyTable.atDistanceTraveled, newEvent.atDistanceTraveled),
+          gt(historyTable.atDistanceTraveled, newAtDistanceTraveled),
         ),
       )
       .limit(1);
@@ -65,7 +79,7 @@ export async function createUserHistoryEvent(
         and(
           eq(historyTable.vehicleId, vehicleId),
           gt(historyTable.date, newEvent.date),
-          lt(historyTable.atDistanceTraveled, newEvent.atDistanceTraveled),
+          lt(historyTable.atDistanceTraveled, newAtDistanceTraveled),
         ),
       )
       .limit(1);
@@ -84,17 +98,25 @@ export async function createUserHistoryEvent(
     // update current vehicle distanceTraveled
     if (
       !latestEvent ||
-      latestEvent.atDistanceTraveled < newEvent.atDistanceTraveled
+      latestEvent.atDistanceTraveled < newAtDistanceTraveled
     ) {
       await db
         .update(vehicleTable)
         .set({
-          distanceTraveled: newEvent.atDistanceTraveled,
+          distanceTraveled: newAtDistanceTraveled,
         })
         .where(eq(vehicleTable.id, vehicleId));
     }
 
-    await createHistoryEvent(vehicleId, newEvent);
+    const addedEvent = await createHistoryEvent(vehicleId, {
+      ...newEvent,
+      atDistanceTraveled: newAtDistanceTraveled,
+    });
+
+    if (!addedEvent) throw new Error("Failed to create event");
+    const currency = await getUserCurrency(user.id);
+
+    await createPaymentForHistoryEvent(addedEvent.id, newEvent.cost, currency);
 
     return responseSuccess();
   } catch (error) {
@@ -128,6 +150,7 @@ export async function updateVehicleHistoryEvent(
 ) {
   try {
     addHistoryEventSchema.partial().parse(newEvent);
+
     const event = await db.query.historyTable.findFirst({
       where: eq(historyTable.id, eventId),
       with: {
@@ -137,10 +160,16 @@ export async function updateVehicleHistoryEvent(
 
     if (!event) throw new NotFoundError("Event not found");
 
-    await authorize(async (user) => {
+    const user = await authorize(async (user) => {
       if (event.vehicle.ownerId !== user.id) return false;
       return true;
     });
+
+    const units = await getUserUnits(user.id);
+    const newAtDistanceTraveled = convertToMetric(
+      newEvent.atDistanceTraveled,
+      units,
+    );
 
     // Check for preceding events with higher distance traveled
     const precedingConflict = await db
@@ -150,7 +179,7 @@ export async function updateVehicleHistoryEvent(
         and(
           eq(historyTable.vehicleId, event.vehicleId),
           lt(historyTable.date, newEvent.date),
-          gt(historyTable.atDistanceTraveled, newEvent.atDistanceTraveled),
+          gt(historyTable.atDistanceTraveled, newAtDistanceTraveled),
         ),
       )
       .limit(1);
@@ -169,7 +198,7 @@ export async function updateVehicleHistoryEvent(
         and(
           eq(historyTable.vehicleId, event.vehicleId),
           gt(historyTable.date, newEvent.date),
-          lt(historyTable.atDistanceTraveled, newEvent.atDistanceTraveled),
+          lt(historyTable.atDistanceTraveled, newAtDistanceTraveled),
         ),
       )
       .limit(1);
@@ -180,7 +209,17 @@ export async function updateVehicleHistoryEvent(
       );
     }
 
-    const [updatedEvent] = await updateHistoryEvent(eventId, newEvent);
+    const latestEvent = await getLatestHistoryEvent(event.vehicleId);
+
+    if (latestEvent && latestEvent.atDistanceTraveled < newAtDistanceTraveled) {
+      await updateVehicle(event.vehicleId, {
+        distanceTraveled: newAtDistanceTraveled,
+      });
+    }
+
+    const currency = await getUserCurrency(user.id);
+    await updatePaymentForHistoryEvent(eventId, newEvent.cost, currency);
+    const updatedEvent = await updateHistoryEvent(eventId, newEvent);
 
     return responseSuccess(updatedEvent);
   } catch (error) {

@@ -10,6 +10,7 @@ import { authorize } from "~/lib/server/authorize";
 import { getLatestHistoryEvent } from "~/lib/server/history";
 import {
   getUserProfileFromUserId,
+  updateUserProfileFromUserId,
   updateUserProfileSelectedVehicle,
 } from "~/lib/server/user-profile";
 import {
@@ -21,6 +22,7 @@ import {
 import { NotFoundError, UserInputError } from "~/lib/utils/error";
 import { responseError, responseSuccess } from "~/lib/utils/response";
 
+import { userProfileSchema } from "../actions/user-profile-validators";
 import { addVehicleSchema } from "../actions/vehicle-validators";
 
 export async function getUserVehicles() {
@@ -166,6 +168,39 @@ export async function updateUserVehicle(
     }
 
     await updateVehicle(vehicleId, newVehicle);
+
+    return responseSuccess();
+  } catch (error) {
+    return responseError(error);
+  }
+}
+
+export async function getUserProfile(userId: string) {
+  try {
+    await authorize(async (user) => {
+      return user.id === userId;
+    });
+
+    const userProfile = await getUserProfileFromUserId(userId);
+
+    return responseSuccess(userProfile);
+  } catch (error) {
+    return responseError(error);
+  }
+}
+
+export async function updateUserProfile(
+  userId: string,
+  newUserProfile: z.infer<typeof userProfileSchema>,
+) {
+  try {
+    await authorize(async (user) => {
+      return user.id === userId;
+    });
+
+    userProfileSchema.parse(newUserProfile);
+
+    await updateUserProfileFromUserId(userId, newUserProfile);
 
     return responseSuccess();
   } catch (error) {
