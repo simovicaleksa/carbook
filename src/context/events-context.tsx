@@ -2,11 +2,11 @@
 
 import { createContext, use, useEffect, useState } from "react";
 
-import { type InferSelectModel } from "drizzle-orm";
+import { type moneyTable, type historyTable } from "~/db/_schema";
 
-import { type historyTable } from "~/db/_schema";
-
-export type EventType = InferSelectModel<typeof historyTable>;
+export type EventType = typeof historyTable.$inferSelect & {
+  cost?: typeof moneyTable.$inferSelect | null;
+};
 
 type EventContextType = {
   events: EventType[];
