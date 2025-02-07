@@ -29,3 +29,12 @@ export function metersToKm(meters: number) {
 export function metersToMiles(meters: number) {
   return meters / 1609.34;
 }
+
+export function convertToMetric(
+  value: number,
+  units: "imperial" | "metric" = "metric",
+) {
+  if (units === "metric") return value;
+
+  return Math.round(value * 1.60934);
+}
