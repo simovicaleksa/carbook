@@ -14,7 +14,6 @@ import { useUserProfile } from "~/context/user-profile-context";
 
 import { useUnits } from "~/hooks/use-units";
 
-import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import {
   Dialog,
