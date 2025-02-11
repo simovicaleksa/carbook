@@ -83,7 +83,7 @@ export function TimelineItem({
                 <CardTitle className="mb-2 flex w-full flex-row items-center justify-between capitalize">
                   <span>{event.type}</span>
                   {event?.cost?.amount ? (
-                    <Badge className="rounded-md text-base">
+                    <Badge className="rounded-md text-base tracking-wide">
                       {formatPrice(event.cost.amount, event.cost.currency)}
                     </Badge>
                   ) : null}
