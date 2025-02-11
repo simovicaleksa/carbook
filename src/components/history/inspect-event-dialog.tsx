@@ -61,12 +61,12 @@ export default function InspectEventDialog() {
                   {formatDistanceString(event.atDistanceTraveled)}
                 </span>
               </div>
-              <Badge className="size-fit rounded-md font-sans text-2xl">
+              <span className="p-5 text-xl font-medium">
                 {formatPrice(
                   event?.cost?.amount ?? 0,
                   event?.cost?.currency ?? userProfile.preferredCurrency,
                 )}
-              </Badge>
+              </span>
             </div>
 
             <div className="rounded-md bg-secondary p-5 text-sm">
