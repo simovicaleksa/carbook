@@ -13,6 +13,7 @@ import {
   createHistoryEvent,
   deleteHistoryEvent,
   getHistoryEvents,
+  getHistoryEventsCount,
   getLatestHistoryEvent,
   updateHistoryEvent,
 } from "~/lib/server/history";
@@ -124,7 +125,11 @@ export async function createUserHistoryEvent(
   }
 }
 
-export async function getVehicleHistoryEvents(vehicleId: string) {
+export async function getVehicleHistoryEvents(
+  vehicleId: string,
+  page = 1,
+  perPage = 20,
+) {
   try {
     await authorize(async (user) => {
       const vehicle = await db.query.vehicleTable.findFirst({
@@ -136,9 +141,15 @@ export async function getVehicleHistoryEvents(vehicleId: string) {
       return true;
     });
 
-    const events = await getHistoryEvents(vehicleId);
+    const events = await getHistoryEvents(vehicleId, page, perPage);
+    const total = await getHistoryEventsCount(vehicleId);
 
-    return responseSuccess(events);
+    const responseObject = {
+      events,
+      total,
+    };
+
+    return responseSuccess(responseObject);
   } catch (error) {
     return responseError(error);
   }

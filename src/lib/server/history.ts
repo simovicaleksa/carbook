@@ -20,15 +20,24 @@ export async function createHistoryEvent(
   return insertedEvent;
 }
 
-export async function getHistoryEvents(vehicleId: string) {
+export async function getHistoryEvents(
+  vehicleId: string,
+  page = 1,
+  perPage = 20,
+) {
   return await db.query.historyTable.findMany({
     where: eq(historyTable.vehicleId, vehicleId),
     with: {
       cost: true,
     },
     orderBy: desc(historyTable.date),
-    limit: 20,
+    limit: perPage,
+    offset: (page - 1) * perPage,
   });
+}
+
+export async function getHistoryEventsCount(vehicleId: string) {
+  return await db.$count(historyTable, eq(historyTable.vehicleId, vehicleId));
 }
 
 export async function updateHistoryEvent(
