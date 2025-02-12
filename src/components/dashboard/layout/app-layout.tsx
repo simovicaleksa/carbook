@@ -30,9 +30,5 @@ export function AppLayoutFooter({
   children?: React.ReactNode;
   className?: string;
 }) {
-  return (
-    <footer className={cn("border-t bg-sidebar p-5 shadow xl:p-10", className)}>
-      {children}
-    </footer>
-  );
+  return <footer className={cn("p-5 xl:p-10", className)}>{children}</footer>;
 }
