@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, use, useEffect, useState } from "react";
+import { createContext, use } from "react";
 
 import { type moneyTable, type historyTable } from "~/db/_schema";
 
@@ -10,26 +10,22 @@ export type EventType = typeof historyTable.$inferSelect & {
 
 type EventContextType = {
   events: EventType[];
-  setEvents: React.Dispatch<React.SetStateAction<EventType[]>>;
+  total: number;
 };
 
 const EventsContext = createContext<EventContextType | null>(null);
 
 export function EventsProvider({
   children,
-  defaultValue,
+  events,
+  total,
 }: {
   children: React.ReactNode;
-  defaultValue: EventType[];
+  events: EventType[];
+  total: number;
 }) {
-  const [events, setEvents] = useState<EventType[]>([]);
-
-  useEffect(() => {
-    setEvents(defaultValue);
-  }, [defaultValue]);
-
   return (
-    <EventsContext.Provider value={{ events, setEvents }}>
+    <EventsContext.Provider value={{ events, total }}>
       {children}
     </EventsContext.Provider>
   );
