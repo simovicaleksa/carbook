@@ -20,7 +20,7 @@ export function AppLayoutHeader({
 }
 
 export function AppLayoutContent({ children }: { children?: React.ReactNode }) {
-  return <div className="p-5 xl:p-10">{children}</div>;
+  return <div className="min-h-[75vh] p-5 xl:p-10">{children}</div>;
 }
 
 export function AppLayoutFooter({
