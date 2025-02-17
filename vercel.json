@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "framework": "nextjs",
+  "builds": [
+    {
+      "src": "next.config.js",
+      "use": "@vercel/next"
+    }
+  ],
+  "hooks": {
+    "pre-build": "./install-bun.sh",
+    "post-deploy": "bun run db:migrate"
+  }
+}
