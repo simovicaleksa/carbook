@@ -18,13 +18,13 @@ import { getVehicleHistoryEvents } from "./actions";
 
 const PER_PAGE = 20;
 
-export default async function History({
-  searchParams,
-}: {
-  searchParams: {
+export default async function History(props: {
+  searchParams: Promise<{
     page?: number;
-  };
+  }>;
 }) {
+  const searchParams = await props.searchParams;
+
   const { data: selectedVehicle } = await getCurrentSelectedVehicle();
 
   if (!selectedVehicle) return notFound();
