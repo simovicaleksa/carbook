@@ -86,7 +86,14 @@ export function UpsertHistoryFormFields({
                 value={
                   field.value ? field.value.toISOString().split("T")[0] : ""
                 }
-                onChange={(e) => field.onChange(new Date(e.target.value))}
+                onChange={(e) => {
+                  const newDate = new Date(e.target.value);
+                  if (!isNaN(newDate.getTime())) {
+                    field.onChange(newDate);
+                  } else {
+                    field.onChange(null);
+                  }
+                }}
               />
             </FormControl>
             <FormMessage />
