@@ -4,7 +4,7 @@ import { type InputProps } from "react-day-picker";
 import { Input } from "../ui/input";
 
 type InputWithUnitsProps = InputProps & {
-  units?: "metric" | "imperial";
+  units?: string;
   disabled?: boolean;
 };
 
