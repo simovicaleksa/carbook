@@ -20,10 +20,13 @@ export default function AppPagination({ perPage = 20 }: { perPage?: number }) {
   const page = Number(getParam("page")) ?? 1;
   const { total } = useEvents();
 
-  const maxPage = Math.ceil(total / perPage);
+  const maxPage = total == 0 ? 1 : Math.ceil(total / perPage);
 
-  const previousPage = `${pathname}?${createQueryString("page", String(page - 1 > 0 ? page - 1 : 1))}`;
-  const nextPage = `${pathname}?${createQueryString("page", String(page + 1 < maxPage ? page + 1 : maxPage))}`;
+  const hasPrevious = page > 1;
+  const hasNext = page < maxPage;
+
+  const previousPage = `${pathname}?${createQueryString("page", String(hasPrevious ? page - 1 : 1))}`;
+  const nextPage = `${pathname}?${createQueryString("page", String(hasNext ? page + 1 : maxPage))}`;
 
   useEffect(() => {
     if (!page) setParam("page", "1", "replace");
@@ -33,7 +36,7 @@ export default function AppPagination({ perPage = 20 }: { perPage?: number }) {
     <div className="mx-auto flex w-fit flex-col items-center justify-center gap-2">
       <Pagination>
         <PaginationContent>
-          <PaginationPrevious href={previousPage} />
+          <PaginationPrevious href={previousPage} disabled={!hasPrevious} />
           <PaginationItem>
             <PaginationLink isActive href={"#"}>
               {page}
@@ -43,7 +46,7 @@ export default function AppPagination({ perPage = 20 }: { perPage?: number }) {
         </PaginationContent>
       </Pagination>
       <span className="text-sm text-muted-foreground">
-        {page} of {Math.ceil(total / perPage)}
+        {page} of {maxPage}
       </span>
     </div>
   );
