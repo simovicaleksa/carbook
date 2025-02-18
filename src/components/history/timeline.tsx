@@ -1,18 +1,37 @@
 "use client";
 
-import { Calendar, Edit, Milestone } from "lucide-react";
+import { useState } from "react";
+
+import {
+  Calendar,
+  ChevronRight,
+  Edit,
+  EllipsisVertical,
+  Milestone,
+  Trash2,
+} from "lucide-react";
 
 import { cn } from "~/lib/utils";
 import { convertToLocalDateString } from "~/lib/utils/date";
 import { getEventTypeIcon } from "~/lib/utils/icon";
 import { formatPrice } from "~/lib/utils/money";
 
+import { useDeleteEventDialog } from "~/context/delete-event-dialog-context";
 import { useEditHistoryDialog } from "~/context/edit-history-dialog-context";
 import { type EventType, useEvents } from "~/context/events-context";
 import { useInspectEventDialog } from "~/context/inspect-event-dialog-context";
 import { useSelectedEvent } from "~/context/selected-event-context";
 
 import { useUnits } from "~/hooks/use-units";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
 
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
@@ -47,16 +66,10 @@ export function TimelineItem({
   event: EventType;
   isLeft?: boolean;
 }) {
-  const { toggleOpen: toggleEditDialog } = useEditHistoryDialog();
   const { toggleOpen: toggleInspectDialog } = useInspectEventDialog();
   const { setEvent } = useSelectedEvent();
   const Icon = getEventTypeIcon(event.type);
   const { formatDistanceString } = useUnits();
-
-  const handleEdit = () => {
-    setEvent(event);
-    toggleEditDialog();
-  };
 
   const handleInspect = () => {
     setEvent(event);
@@ -114,34 +127,64 @@ export function TimelineItem({
           </Card>
         </button>
 
-        <div className="absolute -right-5 bottom-0 top-0 z-10 my-auto flex h-fit flex-col gap-2 transition-opacity duration-300 lg:opacity-0 lg:group-hover:opacity-100">
-          <Button
-            variant={"outline"}
-            className="scale-105 rounded-full shadow-md"
-            size={"icon"}
-            onClick={handleEdit}
-          >
-            <span className="sr-only">Edit event</span>
-            <Edit />
-          </Button>
-          {/* <Button
-            variant={"destructive"}
-            className="rounded-full shadow-md"
-            size={"icon"}
-          >
-            <span className="sr-only">Edit event</span>
-            <Trash2 />
-          </Button> */}
-        </div>
+        <TimlineItemDropdown event={event} />
       </div>
     </div>
   );
 }
 
-export function TimelineLoadMore() {
+export function TimlineItemDropdown(props: { event: EventType }) {
+  const [isOpen, setIsOpen] = useState(false);
+  const { setEvent } = useSelectedEvent();
+  const { toggleOpen: toggleEdit } = useEditHistoryDialog();
+  const { toggleOpen: toggleDelete } = useDeleteEventDialog();
+
+  const handleEdit = () => {
+    setEvent(props.event);
+    toggleEdit();
+  };
+  const handleDelete = () => {
+    setEvent(props.event);
+    toggleDelete();
+  };
+
   return (
-    <div className="mt-10 flex w-full items-center lg:justify-center">
-      <Button className="z-10 w-fit">Load more</Button>
+    <div
+      className={cn(
+        "absolute -right-5 bottom-0 top-0 z-10 my-auto flex h-fit flex-col gap-2 transition-opacity duration-300",
+        "lg:opacity-0 lg:group-hover:opacity-100",
+        {
+          "!opacity-100": isOpen,
+        },
+      )}
+    >
+      <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button
+            aria-label="Open actions menu"
+            variant={"outline"}
+            className="scale-105 rounded-full shadow-md"
+            size={"icon"}
+          >
+            {isOpen ? <ChevronRight /> : <EllipsisVertical />}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent side="right" className="min-w-[200px]">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleEdit}>
+            <Edit />
+            Edit
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="!text-destructive"
+            onClick={handleDelete}
+          >
+            <Trash2 />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }
