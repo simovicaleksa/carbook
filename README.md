@@ -25,8 +25,8 @@ You can track the following:
 
 # TODO
 
-- [ ] Car history
-- [ ] Imperial and Metric system support
+- [x] Car history
+- [x] Imperial and Metric system support
 - [ ] Dashboard home page
 - [ ] Upcoming maintenance
 - [ ] Premium plan
