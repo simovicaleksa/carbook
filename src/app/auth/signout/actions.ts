@@ -13,7 +13,7 @@ import { responseError } from "~/lib/utils/response";
 
 export async function signout() {
   try {
-    await db.transaction(async (tx) => {
+    return await db.transaction(async (tx) => {
       const { session } = await getCurrentSession({ transaction: tx });
 
       if (session === null) {

@@ -18,7 +18,7 @@ import { signupSchema } from "./validators";
 
 export async function signUp(signupUser: z.infer<typeof signupSchema>) {
   try {
-    await db.transaction(async (tx) => {
+    return await db.transaction(async (tx) => {
       const parsedUser = signupSchema.parse(signupUser);
       const user = await createUser(parsedUser, { transaction: tx });
       const sessionToken = generateSessionToken();
