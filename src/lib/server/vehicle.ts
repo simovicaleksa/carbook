@@ -6,8 +6,14 @@ import { type addVehicleSchema } from "~/app/actions/vehicle-validators";
 import { db } from "~/db";
 import { userProfileTable, vehicleTable } from "~/db/_schema";
 
-export async function getVehicleFromId(vehicleId: string) {
-  const [vehicle] = await db
+import { type DbOptions } from "./types";
+
+export async function getVehicleFromId(
+  vehicleId: string,
+  options: DbOptions = {},
+) {
+  const client = options.transaction ?? db;
+  const [vehicle] = await client
     .select()
     .from(vehicleTable)
     .where(eq(vehicleTable.id, vehicleId));
@@ -15,8 +21,12 @@ export async function getVehicleFromId(vehicleId: string) {
   return vehicle;
 }
 
-export async function getVehiclesFromUserId(userId: string) {
-  return await db
+export async function getVehiclesFromUserId(
+  userId: string,
+  options: DbOptions = {},
+) {
+  const client = options.transaction ?? db;
+  return await client
     .select()
     .from(vehicleTable)
     .where(eq(vehicleTable.ownerId, userId));
@@ -31,8 +41,10 @@ export async function createVehicle(
     distanceTraveled,
     type,
   }: z.infer<typeof addVehicleSchema>,
+  options: DbOptions = {},
 ) {
-  const [vehicle] = await db
+  const client = options.transaction ?? db;
+  const [vehicle] = await client
     .insert(vehicleTable)
     .values({
       make,
@@ -54,21 +66,27 @@ export async function createVehicle(
 export async function updateVehicle(
   vehicleId: string,
   newVehicle: Partial<z.infer<typeof addVehicleSchema>>,
+  options: DbOptions = {},
 ) {
-  const vehicle = await getVehicleFromId(vehicleId);
+  const client = options.transaction ?? db;
+  const vehicle = await getVehicleFromId(vehicleId, options);
 
   if (!vehicle) {
     throw new Error("Vehicle not found");
   }
 
-  await db
+  await client
     .update(vehicleTable)
     .set(newVehicle)
     .where(eq(vehicleTable.id, vehicle.id));
 }
 
-export async function deleteVehicle(vehicleId: string) {
-  await db.delete(vehicleTable).where(eq(vehicleTable.id, vehicleId));
+export async function deleteVehicle(
+  vehicleId: string,
+  options: DbOptions = {},
+) {
+  const client = options.transaction ?? db;
+  await client.delete(vehicleTable).where(eq(vehicleTable.id, vehicleId));
 }
 
 export async function getSelectedVehicleFromUserId(userId: string) {

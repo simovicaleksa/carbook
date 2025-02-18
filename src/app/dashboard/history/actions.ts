@@ -22,7 +22,7 @@ import {
   updatePaymentForHistoryEvent,
 } from "~/lib/server/money";
 import { getUserCurrency, getUserUnits } from "~/lib/server/user-profile";
-import { updateVehicle } from "~/lib/server/vehicle";
+import { getVehicleFromId, updateVehicle } from "~/lib/server/vehicle";
 import { NotFoundError, UserInputError } from "~/lib/utils/error";
 import { responseError, responseSuccess } from "~/lib/utils/response";
 import { convertToMetric } from "~/lib/utils/units";
@@ -32,94 +32,102 @@ export async function createUserHistoryEvent(
   newEvent: z.infer<typeof addHistoryEventSchema>,
 ) {
   try {
-    const user = await authorize(async (user) => {
-      const vehicle = await db.query.vehicleTable.findFirst({
-        where: and(
-          eq(vehicleTable.id, vehicleId),
-          eq(vehicleTable.ownerId, user.id),
-        ),
+    return await db.transaction(async (tx) => {
+      const user = await authorize(
+        async (user) => {
+          const vehicle = await getVehicleFromId(vehicleId, {
+            transaction: tx,
+          });
+          return vehicle?.ownerId === user.id;
+        },
+        { transaction: tx },
+      );
+
+      addHistoryEventSchema.parse(newEvent);
+
+      const units = await getUserUnits(user.id, { transaction: tx });
+      const newAtDistanceTraveled = convertToMetric(
+        newEvent.atDistanceTraveled,
+        units,
+      );
+
+      // Check for preceding events with higher distance traveled
+      const precedingConflict = await tx
+        .select()
+        .from(historyTable)
+        .where(
+          and(
+            eq(historyTable.vehicleId, vehicleId),
+            lt(historyTable.date, newEvent.date),
+            gt(historyTable.atDistanceTraveled, newAtDistanceTraveled),
+          ),
+        )
+        .limit(1);
+
+      if (precedingConflict.length > 0) {
+        throw new UserInputError(
+          "Older entry with higher distance traveled exists",
+        );
+      }
+
+      // Check for upcoming events with lower distance traveled
+      const upcomingConflict = await tx
+        .select()
+        .from(historyTable)
+        .where(
+          and(
+            eq(historyTable.vehicleId, vehicleId),
+            gt(historyTable.date, newEvent.date),
+            lt(historyTable.atDistanceTraveled, newAtDistanceTraveled),
+          ),
+        )
+        .limit(1);
+
+      if (upcomingConflict.length > 0) {
+        throw new UserInputError(
+          "Newer entry with lower distance traveled exists",
+        );
+      }
+
+      const latestEvent = await tx.query.historyTable.findFirst({
+        orderBy: desc(historyTable.atDistanceTraveled),
+        where: and(eq(historyTable.vehicleId, vehicleId)),
       });
 
-      if (!vehicle) return false;
+      // update current vehicle distanceTraveled
+      if (
+        !latestEvent ||
+        latestEvent.atDistanceTraveled < newAtDistanceTraveled
+      ) {
+        await tx
+          .update(vehicleTable)
+          .set({
+            distanceTraveled: newAtDistanceTraveled,
+          })
+          .where(eq(vehicleTable.id, vehicleId));
+      }
 
-      return true;
-    });
-
-    addHistoryEventSchema.parse(newEvent);
-
-    const units = await getUserUnits(user.id);
-    const newAtDistanceTraveled = convertToMetric(
-      newEvent.atDistanceTraveled,
-      units,
-    );
-
-    // Check for preceding events with higher distance traveled
-    const precedingConflict = await db
-      .select()
-      .from(historyTable)
-      .where(
-        and(
-          eq(historyTable.vehicleId, vehicleId),
-          lt(historyTable.date, newEvent.date),
-          gt(historyTable.atDistanceTraveled, newAtDistanceTraveled),
-        ),
-      )
-      .limit(1);
-
-    if (precedingConflict.length > 0) {
-      throw new UserInputError(
-        "Older entry with higher distance traveled exists",
+      const addedEvent = await createHistoryEvent(
+        vehicleId,
+        {
+          ...newEvent,
+          atDistanceTraveled: newAtDistanceTraveled,
+        },
+        { transaction: tx },
       );
-    }
 
-    // Check for upcoming events with lower distance traveled
-    const upcomingConflict = await db
-      .select()
-      .from(historyTable)
-      .where(
-        and(
-          eq(historyTable.vehicleId, vehicleId),
-          gt(historyTable.date, newEvent.date),
-          lt(historyTable.atDistanceTraveled, newAtDistanceTraveled),
-        ),
-      )
-      .limit(1);
+      if (!addedEvent) throw new Error("Failed to create event");
 
-    if (upcomingConflict.length > 0) {
-      throw new UserInputError(
-        "Newer entry with lower distance traveled exists",
+      const currency = await getUserCurrency(user.id, { transaction: tx });
+      await createPaymentForHistoryEvent(
+        addedEvent.id,
+        newEvent.cost,
+        currency,
+        { transaction: tx },
       );
-    }
 
-    const latestEvent = await db.query.historyTable.findFirst({
-      orderBy: desc(historyTable.atDistanceTraveled),
-      where: and(eq(historyTable.vehicleId, vehicleId)),
+      return responseSuccess();
     });
-
-    // update current vehicle distanceTraveled
-    if (
-      !latestEvent ||
-      latestEvent.atDistanceTraveled < newAtDistanceTraveled
-    ) {
-      await db
-        .update(vehicleTable)
-        .set({
-          distanceTraveled: newAtDistanceTraveled,
-        })
-        .where(eq(vehicleTable.id, vehicleId));
-    }
-
-    const addedEvent = await createHistoryEvent(vehicleId, {
-      ...newEvent,
-      atDistanceTraveled: newAtDistanceTraveled,
-    });
-
-    if (!addedEvent) throw new Error("Failed to create event");
-    const currency = await getUserCurrency(user.id);
-
-    await createPaymentForHistoryEvent(addedEvent.id, newEvent.cost, currency);
-
-    return responseSuccess();
   } catch (error) {
     return responseError(error);
   }
@@ -131,25 +139,36 @@ export async function getVehicleHistoryEvents(
   perPage = 20,
 ) {
   try {
-    await authorize(async (user) => {
-      const vehicle = await db.query.vehicleTable.findFirst({
-        where: eq(vehicleTable.id, vehicleId),
+    return await db.transaction(async (tx) => {
+      await authorize(
+        async (user) => {
+          const vehicle = await tx.query.vehicleTable.findFirst({
+            where: eq(vehicleTable.id, vehicleId),
+          });
+
+          if (vehicle?.ownerId !== user.id) return false;
+
+          return true;
+        },
+        {
+          transaction: tx,
+        },
+      );
+
+      const events = await getHistoryEvents(vehicleId, page, perPage, {
+        transaction: tx,
+      });
+      const total = await getHistoryEventsCount(vehicleId, {
+        transaction: tx,
       });
 
-      if (vehicle?.ownerId !== user.id) return false;
+      const responseObject = {
+        events,
+        total,
+      };
 
-      return true;
+      return responseSuccess(responseObject);
     });
-
-    const events = await getHistoryEvents(vehicleId, page, perPage);
-    const total = await getHistoryEventsCount(vehicleId);
-
-    const responseObject = {
-      events,
-      total,
-    };
-
-    return responseSuccess(responseObject);
   } catch (error) {
     return responseError(error);
   }
@@ -160,79 +179,101 @@ export async function updateVehicleHistoryEvent(
   newEvent: z.infer<typeof addHistoryEventSchema>,
 ) {
   try {
-    addHistoryEventSchema.partial().parse(newEvent);
+    return await db.transaction(async (tx) => {
+      addHistoryEventSchema.partial().parse(newEvent);
 
-    const event = await db.query.historyTable.findFirst({
-      where: eq(historyTable.id, eventId),
-      with: {
-        vehicle: true,
-      },
-    });
-
-    if (!event) throw new NotFoundError("Event not found");
-
-    const user = await authorize(async (user) => {
-      if (event.vehicle.ownerId !== user.id) return false;
-      return true;
-    });
-
-    const units = await getUserUnits(user.id);
-    const newAtDistanceTraveled = convertToMetric(
-      newEvent.atDistanceTraveled,
-      units,
-    );
-
-    // Check for preceding events with higher distance traveled
-    const precedingConflict = await db
-      .select()
-      .from(historyTable)
-      .where(
-        and(
-          eq(historyTable.vehicleId, event.vehicleId),
-          lt(historyTable.date, newEvent.date),
-          gt(historyTable.atDistanceTraveled, newAtDistanceTraveled),
-        ),
-      )
-      .limit(1);
-
-    if (precedingConflict.length > 0) {
-      throw new UserInputError(
-        "Older entry with higher distance traveled exists",
-      );
-    }
-
-    // Check for upcoming events with lower distance traveled
-    const upcomingConflict = await db
-      .select()
-      .from(historyTable)
-      .where(
-        and(
-          eq(historyTable.vehicleId, event.vehicleId),
-          gt(historyTable.date, newEvent.date),
-          lt(historyTable.atDistanceTraveled, newAtDistanceTraveled),
-        ),
-      )
-      .limit(1);
-
-    if (upcomingConflict.length > 0) {
-      throw new UserInputError(
-        "Newer entry with lower distance traveled exists",
-      );
-    }
-
-    const latestEvent = await getLatestHistoryEvent(event.vehicleId);
-
-    if (latestEvent && latestEvent.atDistanceTraveled < newAtDistanceTraveled) {
-      await updateVehicle(event.vehicleId, {
-        distanceTraveled: newAtDistanceTraveled,
+      const event = await tx.query.historyTable.findFirst({
+        where: eq(historyTable.id, eventId),
+        with: {
+          vehicle: true,
+        },
       });
-    }
 
-    const currency = await getUserCurrency(user.id);
-    await updatePaymentForHistoryEvent(eventId, newEvent.cost, currency);
-    const updatedEvent = await updateHistoryEvent(eventId, newEvent);
+      if (!event) throw new NotFoundError("Event not found");
 
-    return responseSuccess(updatedEvent);
+      const user = await authorize(
+        async (user) => {
+          if (event.vehicle.ownerId !== user.id) return false;
+          return true;
+        },
+        {
+          transaction: tx,
+        },
+      );
+
+      const units = await getUserUnits(user.id, { transaction: tx });
+      const newAtDistanceTraveled = convertToMetric(
+        newEvent.atDistanceTraveled,
+        units,
+      );
+
+      // Check for preceding events with higher distance traveled
+      const precedingConflict = await tx
+        .select()
+        .from(historyTable)
+        .where(
+          and(
+            eq(historyTable.vehicleId, event.vehicleId),
+            lt(historyTable.date, newEvent.date),
+            gt(historyTable.atDistanceTraveled, newAtDistanceTraveled),
+          ),
+        )
+        .limit(1);
+
+      if (precedingConflict.length > 0) {
+        throw new UserInputError(
+          "Older entry with higher distance traveled exists",
+        );
+      }
+
+      // Check for upcoming events with lower distance traveled
+      const upcomingConflict = await tx
+        .select()
+        .from(historyTable)
+        .where(
+          and(
+            eq(historyTable.vehicleId, event.vehicleId),
+            gt(historyTable.date, newEvent.date),
+            lt(historyTable.atDistanceTraveled, newAtDistanceTraveled),
+          ),
+        )
+        .limit(1);
+
+      if (upcomingConflict.length > 0) {
+        throw new UserInputError(
+          "Newer entry with lower distance traveled exists",
+        );
+      }
+
+      const latestEvent = await getLatestHistoryEvent(event.vehicleId, {
+        transaction: tx,
+      });
+
+      if (
+        latestEvent &&
+        latestEvent.atDistanceTraveled < newAtDistanceTraveled
+      ) {
+        await updateVehicle(
+          event.vehicleId,
+          {
+            distanceTraveled: newAtDistanceTraveled,
+          },
+          {
+            transaction: tx,
+          },
+        );
+      }
+
+      const currency = await getUserCurrency(user.id, { transaction: tx });
+      await updatePaymentForHistoryEvent(eventId, newEvent.cost, currency, {
+        transaction: tx,
+      });
+      const updatedEvent = await updateHistoryEvent(eventId, newEvent, {
+        transaction: tx,
+      });
+
+      return responseSuccess(updatedEvent);
+    });
   } catch (error) {
     return responseError(error);
   }
@@ -240,22 +281,31 @@ export async function updateVehicleHistoryEvent(
 
 export async function deleteVehicleHistoryEvent(eventId: number) {
   try {
-    await authorize(async (user) => {
-      const event = await db.query.historyTable.findFirst({
-        where: eq(historyTable.id, eventId),
-        with: {
-          vehicle: true,
+    return await db.transaction(async (tx) => {
+      await authorize(
+        async (user) => {
+          const event = await tx.query.historyTable.findFirst({
+            where: eq(historyTable.id, eventId),
+            with: {
+              vehicle: true,
+            },
+          });
+
+          if (event?.vehicle.ownerId !== user.id) return false;
+
+          return true;
         },
+        {
+          transaction: tx,
+        },
+      );
+
+      await deleteHistoryEvent(eventId, {
+        transaction: tx,
       });
 
-      if (event?.vehicle.ownerId !== user.id) return false;
-
-      return true;
+      return responseSuccess();
     });
-
-    await deleteHistoryEvent(eventId);
-
-    return responseSuccess();
   } catch (error) {
     return responseError(error);
   }

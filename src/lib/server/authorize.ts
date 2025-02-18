@@ -1,11 +1,13 @@
 import { AuthorizationError } from "../utils/error";
 
 import { getCurrentSession, type User } from "./auth";
+import { type DbOptions } from "./types";
 
 export async function authorize(
   check: (user: User) => Promise<boolean> | boolean = () => true,
+  options: DbOptions = {},
 ) {
-  const { user } = await getCurrentSession();
+  const { user } = await getCurrentSession(options);
 
   if (!user) {
     throw new AuthorizationError("Not authorized");

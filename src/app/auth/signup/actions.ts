@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 
 import { type z } from "zod";
 
+import { db } from "~/db";
+
 import {
   createSession,
   generateSessionToken,
@@ -16,16 +18,17 @@ import { signupSchema } from "./validators";
 
 export async function signUp(signupUser: z.infer<typeof signupSchema>) {
   try {
-    const parsedUser = signupSchema.parse(signupUser);
-
-    const user = await createUser(parsedUser);
-
-    const sessionToken = generateSessionToken();
-    const session = await createSession(sessionToken, user.id);
-    await setSessionTokenCookie(sessionToken, session.expiresAt);
+    await db.transaction(async (tx) => {
+      const parsedUser = signupSchema.parse(signupUser);
+      const user = await createUser(parsedUser, { transaction: tx });
+      const sessionToken = generateSessionToken();
+      const session = await createSession(sessionToken, user.id, {
+        transaction: tx,
+      });
+      await setSessionTokenCookie(sessionToken, session.expiresAt);
+      return redirect("/welcome/signup");
+    });
   } catch (error) {
     return responseError(error);
   }
-
-  redirect("/welcome/signup");
 }

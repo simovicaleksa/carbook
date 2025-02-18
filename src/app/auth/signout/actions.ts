@@ -2,6 +2,8 @@
 
 import { redirect } from "next/navigation";
 
+import { db } from "~/db";
+
 import {
   deleteSessionTokenCookie,
   getCurrentSession,
@@ -11,17 +13,19 @@ import { responseError } from "~/lib/utils/response";
 
 export async function signout() {
   try {
-    const { session } = await getCurrentSession();
+    await db.transaction(async (tx) => {
+      const { session } = await getCurrentSession({ transaction: tx });
 
-    if (session === null) {
-      throw new Error("Not logged in");
-    }
+      if (session === null) {
+        throw new Error("Not logged in");
+      }
 
-    await invalidateSession(session.id);
-    await deleteSessionTokenCookie();
+      await invalidateSession(session.id, { transaction: tx });
+      await deleteSessionTokenCookie();
+
+      return redirect("/auth/login");
+    });
   } catch (error) {
     return responseError(error);
   }
-
-  return redirect("/auth/login");
 }

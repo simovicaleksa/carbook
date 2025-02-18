@@ -27,11 +27,13 @@ import { addVehicleSchema } from "../actions/vehicle-validators";
 
 export async function getUserVehicles() {
   try {
-    const user = await authorize();
-
-    const userVehicles = await getVehiclesFromUserId(user.id);
-
-    return responseSuccess(userVehicles);
+    return await db.transaction(async (tx) => {
+      const user = await authorize(undefined, { transaction: tx });
+      const userVehicles = await getVehiclesFromUserId(user.id, {
+        transaction: tx,
+      });
+      return responseSuccess(userVehicles);
+    });
   } catch (error) {
     return responseError(error);
   }
@@ -41,30 +43,29 @@ export async function createUserVehicle(
   newVehicle: z.infer<typeof addVehicleSchema>,
 ) {
   try {
-    addVehicleSchema.parse(newVehicle);
+    return await db.transaction(async (tx) => {
+      addVehicleSchema.parse(newVehicle);
 
-    const user = await authorize();
+      const user = await authorize(undefined, { transaction: tx });
+      const vehicle = await createVehicle(user.id, newVehicle, {
+        transaction: tx,
+      });
+      const userProfile = await getUserProfileFromUserId(user.id, {
+        transaction: tx,
+      });
 
-    const vehicle = await createVehicle(user.id, newVehicle);
+      if (!userProfile) {
+        throw new Error("User profile not found");
+      }
 
-    const userProfile = await getUserProfileFromUserId(user.id);
+      if (!userProfile.selectedVehicle) {
+        await updateUserProfileSelectedVehicle(user.id, vehicle.id, {
+          transaction: tx,
+        });
+      }
 
-    if (!userProfile) {
-      throw new Error("User profile not found");
-    }
-
-    if (!userProfile.selectedVehicle) {
-      await updateUserProfileSelectedVehicle(user.id, vehicle.id);
-    }
-
-    await db
-      .update(userProfileTable)
-      .set({
-        selectedVehicleId: vehicle.id,
-      })
-      .where(eq(userProfileTable.userId, user.id));
-
-    return responseSuccess();
+      return responseSuccess();
+    });
   } catch (error) {
     return responseError(error);
   }
@@ -72,22 +73,31 @@ export async function createUserVehicle(
 
 export async function selectUserVehicle(vehicleId: string) {
   try {
-    const vehicle = await getVehicleFromId(vehicleId);
+    return await db.transaction(async (tx) => {
+      const vehicle = await getVehicleFromId(vehicleId, {
+        transaction: tx,
+      });
 
-    if (!vehicle) throw new NotFoundError("Vehicle not found");
+      if (!vehicle) throw new NotFoundError("Vehicle not found");
 
-    const user = await authorize((user) => {
-      return vehicle.ownerId === user.id;
+      const user = await authorize(
+        (user) => {
+          return vehicle.ownerId === user.id;
+        },
+        {
+          transaction: tx,
+        },
+      );
+
+      await tx
+        .update(userProfileTable)
+        .set({
+          selectedVehicleId: vehicle.id,
+        })
+        .where(eq(userProfileTable.userId, user.id));
+
+      return responseSuccess(vehicle);
     });
-
-    await db
-      .update(userProfileTable)
-      .set({
-        selectedVehicleId: vehicle.id,
-      })
-      .where(eq(userProfileTable.userId, user.id));
-
-    return responseSuccess(vehicle);
   } catch (error) {
     return responseError(error);
   }
@@ -95,16 +105,18 @@ export async function selectUserVehicle(vehicleId: string) {
 
 export async function getCurrentSelectedVehicle() {
   try {
-    const user = await authorize();
+    return await db.transaction(async (tx) => {
+      const user = await authorize(undefined, { transaction: tx });
 
-    const userProfile = await db.query.userProfileTable.findFirst({
-      where: eq(userProfileTable.userId, user.id),
-      with: {
-        selectedVehicle: true,
-      },
+      const userProfile = await tx.query.userProfileTable.findFirst({
+        where: eq(userProfileTable.userId, user.id),
+        with: {
+          selectedVehicle: true,
+        },
+      });
+
+      return responseSuccess(userProfile?.selectedVehicle);
     });
-
-    return responseSuccess(userProfile?.selectedVehicle);
   } catch (error) {
     return responseError(error);
   }
@@ -112,16 +124,18 @@ export async function getCurrentSelectedVehicle() {
 
 export async function getUserSelectedVehicle(userId: string) {
   try {
-    await authorize((user) => user.id == userId);
+    return await db.transaction(async (tx) => {
+      await authorize((user) => user.id == userId, { transaction: tx });
 
-    const userProfile = await db.query.userProfileTable.findFirst({
-      where: eq(userProfileTable.userId, userId),
-      with: {
-        selectedVehicle: true,
-      },
+      const userProfile = await tx.query.userProfileTable.findFirst({
+        where: eq(userProfileTable.userId, userId),
+        with: {
+          selectedVehicle: true,
+        },
+      });
+
+      return responseSuccess(userProfile?.selectedVehicle);
     });
-
-    return responseSuccess(userProfile?.selectedVehicle);
   } catch (error) {
     return responseError(error);
   }
@@ -129,15 +143,21 @@ export async function getUserSelectedVehicle(userId: string) {
 
 export async function updateUserSelectedVehicle(vehicleId: string) {
   try {
-    const vehicle = await getVehicleFromId(vehicleId);
+    return await db.transaction(async (tx) => {
+      const vehicle = await getVehicleFromId(vehicleId, { transaction: tx });
 
-    if (!vehicle) throw new NotFoundError("Vehicle not found");
+      if (!vehicle) throw new NotFoundError("Vehicle not found");
 
-    const user = await authorize((user) => vehicle.ownerId === user.id);
+      const user = await authorize((user) => vehicle.ownerId === user.id, {
+        transaction: tx,
+      });
 
-    await updateUserProfileSelectedVehicle(user.id, vehicleId);
+      await updateUserProfileSelectedVehicle(user.id, vehicleId, {
+        transaction: tx,
+      });
 
-    return responseSuccess();
+      return responseSuccess();
+    });
   } catch (error) {
     return responseError(error);
   }
@@ -148,28 +168,36 @@ export async function updateUserVehicle(
   newVehicle: z.infer<typeof addVehicleSchema>,
 ) {
   try {
-    addVehicleSchema.parse(newVehicle);
+    return await db.transaction(async (tx) => {
+      addVehicleSchema.parse(newVehicle);
 
-    const vehicle = await getVehicleFromId(vehicleId);
+      const vehicle = await getVehicleFromId(vehicleId, { transaction: tx });
 
-    if (!vehicle) throw new NotFoundError("Vehicle not found");
+      if (!vehicle) throw new NotFoundError("Vehicle not found");
 
-    await authorize((user) => vehicle.ownerId === user.id);
+      await authorize((user) => vehicle.ownerId === user.id, {
+        transaction: tx,
+      });
 
-    const latestEvent = await getLatestHistoryEvent(vehicleId);
+      const latestEvent = await getLatestHistoryEvent(vehicleId, {
+        transaction: tx,
+      });
 
-    if (
-      latestEvent &&
-      latestEvent?.atDistanceTraveled > newVehicle.distanceTraveled
-    ) {
-      throw new UserInputError(
-        "Distance traveled is lower than the latest event",
-      );
-    }
+      if (
+        latestEvent &&
+        latestEvent?.atDistanceTraveled > newVehicle.distanceTraveled
+      ) {
+        throw new UserInputError(
+          "Distance traveled is lower than the latest event",
+        );
+      }
 
-    await updateVehicle(vehicleId, newVehicle);
+      await updateVehicle(vehicleId, newVehicle, {
+        transaction: tx,
+      });
 
-    return responseSuccess();
+      return responseSuccess();
+    });
   } catch (error) {
     return responseError(error);
   }
@@ -177,13 +205,20 @@ export async function updateUserVehicle(
 
 export async function getUserProfile(userId: string) {
   try {
-    await authorize(async (user) => {
-      return user.id === userId;
+    return await db.transaction(async (tx) => {
+      await authorize(
+        async (user) => {
+          return user.id === userId;
+        },
+        { transaction: tx },
+      );
+
+      const userProfile = await getUserProfileFromUserId(userId, {
+        transaction: tx,
+      });
+
+      return responseSuccess(userProfile);
     });
-
-    const userProfile = await getUserProfileFromUserId(userId);
-
-    return responseSuccess(userProfile);
   } catch (error) {
     return responseError(error);
   }
@@ -194,15 +229,24 @@ export async function updateUserProfile(
   newUserProfile: z.infer<typeof userProfileSchema>,
 ) {
   try {
-    await authorize(async (user) => {
-      return user.id === userId;
+    return await db.transaction(async (tx) => {
+      await authorize(
+        async (user) => {
+          return user.id === userId;
+        },
+        {
+          transaction: tx,
+        },
+      );
+
+      userProfileSchema.parse(newUserProfile);
+
+      await updateUserProfileFromUserId(userId, newUserProfile, {
+        transaction: tx,
+      });
+
+      return responseSuccess();
     });
-
-    userProfileSchema.parse(newUserProfile);
-
-    await updateUserProfileFromUserId(userId, newUserProfile);
-
-    return responseSuccess();
   } catch (error) {
     return responseError(error);
   }

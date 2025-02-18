@@ -3,8 +3,14 @@ import { eq, type InferSelectModel } from "drizzle-orm";
 import { db } from "~/db";
 import { userProfileTable } from "~/db/_schema";
 
-export async function getUserProfileFromUserId(userId: string) {
-  const userProfile = await db.query.userProfileTable.findFirst({
+import { type DbOptions } from "./types";
+
+export async function getUserProfileFromUserId(
+  userId: string,
+  options: DbOptions = {},
+) {
+  const client = options.transaction ?? db;
+  const userProfile = await client.query.userProfileTable.findFirst({
     where: eq(userProfileTable.userId, userId),
     with: {
       selectedVehicle: true,
@@ -21,8 +27,10 @@ export async function getUserProfileFromUserId(userId: string) {
 export async function updateUserProfileSelectedVehicle(
   userId: string,
   vehicleId: string,
+  options: DbOptions = {},
 ) {
-  await db
+  const client = options.transaction ?? db;
+  await client
     .update(userProfileTable)
     .set({
       selectedVehicleId: vehicleId,
@@ -33,21 +41,24 @@ export async function updateUserProfileSelectedVehicle(
 export async function updateUserProfileFromUserId(
   userId: string,
   newUserProfile: Partial<InferSelectModel<typeof userProfileTable>>,
+  options: DbOptions = {},
 ) {
-  await db
+  const client = options.transaction ?? db;
+
+  await client
     .update(userProfileTable)
     .set(newUserProfile)
     .where(eq(userProfileTable.userId, userId));
 }
 
-export async function getUserCurrency(userId: string) {
-  const userProfile = await getUserProfileFromUserId(userId);
+export async function getUserCurrency(userId: string, options: DbOptions = {}) {
+  const userProfile = await getUserProfileFromUserId(userId, options);
 
   return userProfile.preferredCurrency ?? "USD";
 }
 
-export async function getUserUnits(userId: string) {
-  const userProfile = await getUserProfileFromUserId(userId);
+export async function getUserUnits(userId: string, options: DbOptions = {}) {
+  const userProfile = await getUserProfileFromUserId(userId, options);
 
   return userProfile.preferredUnits ?? "metric";
 }
