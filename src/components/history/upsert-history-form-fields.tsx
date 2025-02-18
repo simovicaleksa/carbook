@@ -110,7 +110,7 @@ export function UpsertHistoryFormFields({
               <Textarea
                 {...field}
                 placeholder="Changed oil filters..."
-                className="min-h-[180px] font-mono !text-lg"
+                className="min-h-[180px] font-mono !text-lg leading-5 tracking-tight"
               />
             </FormControl>
             <FormMessage />

@@ -1,23 +1,24 @@
 "use client";
 
-import { Calendar, Edit, Milestone, Trash2 } from "lucide-react";
+import { Calendar, Milestone } from "lucide-react";
 
 import { convertToLocalDateString } from "~/lib/utils/date";
 import { getEventTypeIcon } from "~/lib/utils/icon";
 import { formatPrice } from "~/lib/utils/money";
 
-import { useDeleteEventDialog } from "~/context/delete-event-dialog-context";
-import { useEditHistoryDialog } from "~/context/edit-history-dialog-context";
 import { useInspectEventDialog } from "~/context/inspect-event-dialog-context";
 import { useSelectedEvent } from "~/context/selected-event-context";
 import { useUserProfile } from "~/context/user-profile-context";
 
+import { useIsMobile } from "~/hooks/use-mobile";
 import { useUnits } from "~/hooks/use-units";
 
 import { Button } from "../ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -25,10 +26,9 @@ import {
 import { ScrollArea } from "../ui/scroll-area";
 
 export default function InspectEventDialog() {
+  const isMobile = useIsMobile();
   const { isOpen, setIsOpen } = useInspectEventDialog();
   const { event } = useSelectedEvent();
-  const { toggleOpen: toggleEditDialog } = useEditHistoryDialog();
-  const { toggleOpen: toggleDeleteDialog } = useDeleteEventDialog();
   const userProfile = useUserProfile();
   const { formatDistanceString } = useUnits();
 
@@ -39,63 +39,57 @@ export default function InspectEventDialog() {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="w-full max-w-3xl p-0">
         <ScrollArea className="max-h-screen">
-          <DialogHeader className="mb-3 px-5 pt-10">
-            <DialogTitle className="flex flex-row items-center justify-between text-3xl capitalize">
-              <span className="flex flex-row items-center gap-2">
-                <Icon className="size-7" />
-                {event.type}
+          <DialogHeader className="mb-3 flex flex-col items-center gap-5 px-5 pt-10">
+            <div className="flex flex-col items-center justify-center gap-2 text-center">
+              <span className="flex size-fit flex-row items-center gap-2 rounded-lg bg-primary p-3 text-primary-foreground">
+                <Icon className="size-6 sm:size-8" />
               </span>
-            </DialogTitle>
-          </DialogHeader>
+              <DialogTitle className="text-2xl capitalize sm:text-4xl">
+                {event.type}
+              </DialogTitle>
+            </div>
 
-          <div className="flex flex-col gap-10 p-5">
-            <div className="flex flex-row items-start justify-between gap-1 font-mono text-lg tracking-tighter text-muted-foreground">
-              <div className="flex flex-col gap-2">
-                <span className="flex flex-row items-center gap-2">
-                  <Calendar className="size-5" />
-                  {convertToLocalDateString(event.date, true)}
-                </span>
-                <span className="flex flex-row items-center gap-2">
-                  <Milestone className="size-5" />
-                  {formatDistanceString(event.atDistanceTraveled)}
-                </span>
-              </div>
-              <span className="p-5 text-xl font-medium">
+            <DialogDescription className="flex w-full flex-row items-center justify-between text-center *:text-sm sm:gap-3 *:sm:text-xl">
+              <span className="flex w-full flex-row items-center justify-end gap-2 whitespace-nowrap text-center font-mono text-muted-foreground">
+                <Calendar className="size-3 sm:size-5" strokeWidth={2} />
+                {convertToLocalDateString(event.date, true)}
+              </span>
+              <span className="mx-5 flex w-full max-w-[100px] flex-row items-center justify-center rounded-lg text-center font-mono text-muted-foreground">
                 {formatPrice(
                   event?.cost?.amount ?? 0,
                   event?.cost?.currency ?? userProfile.preferredCurrency,
                 )}
               </span>
-            </div>
+              <span className="flex w-full flex-row items-center justify-start gap-2 whitespace-nowrap text-center font-mono text-muted-foreground">
+                <Milestone className="size-3 sm:size-5" strokeWidth={2} />
+                {formatDistanceString(event.atDistanceTraveled)}
+              </span>
+            </DialogDescription>
+          </DialogHeader>
 
-            <div className="rounded-md bg-secondary p-5 text-sm">
-              <pre className="whitespace-pre-wrap leading-5">
-                {event.description?.length ? (
-                  event.description
-                ) : (
-                  <span className="italic">No description.</span>
-                )}
-              </pre>
-            </div>
+          <div className="flex flex-col gap-10 p-5 sm:p-10">
+            <ScrollArea>
+              <div className="size-full rounded-md bg-secondary/70 p-5 text-sm">
+                <pre className="size-full whitespace-pre-wrap text-base leading-5 tracking-tight sm:text-lg">
+                  {event.description?.length ? (
+                    event.description
+                  ) : (
+                    <span className="italic">No description.</span>
+                  )}
+                </pre>
+              </div>
+            </ScrollArea>
           </div>
-
-          <DialogFooter className="gap-2 p-5 sm:space-x-0">
-            <Button
-              variant={"outline"}
-              type="button"
-              onClick={toggleEditDialog}
-            >
-              <Edit />
-              Edit
-            </Button>
-            <Button
-              variant={"destructive"}
-              type="button"
-              onClick={toggleDeleteDialog}
-            >
-              <Trash2 />
-              Delete event
-            </Button>
+          <DialogFooter className="p-5 pt-0">
+            <DialogClose asChild>
+              <Button
+                className="w-full sm:w-fit"
+                variant={"outline"}
+                size={isMobile ? "default" : "lg"}
+              >
+                Close
+              </Button>
+            </DialogClose>
           </DialogFooter>
         </ScrollArea>
       </DialogContent>
