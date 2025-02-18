@@ -109,7 +109,7 @@ export async function deleteSessionTokenCookie(): Promise<void> {
 }
 
 export const getCurrentSession = cache(
-  async (options: DbOptions): Promise<SessionValidationResult> => {
+  async (options: DbOptions = {}): Promise<SessionValidationResult> => {
     const cookieStore = await cookies();
     const token = cookieStore.get("session")?.value ?? null;
     if (token === null) {
