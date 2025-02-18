@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 
-import { Flag, HandHeart, Heart, LifeBuoy, Send } from "lucide-react";
+import { Flag, HandHeart, LifeBuoy, Send } from "lucide-react";
 
 import {
   SidebarGroup,
