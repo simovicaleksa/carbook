@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { useForm } from "react-hook-form";
 
@@ -27,6 +28,7 @@ import LoadingButton from "../ui/loading-button";
 
 export default function LoginForm() {
   const loading = useLoading();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -45,6 +47,8 @@ export default function LoginForm() {
       toast.error(`Error - ${res.status}`, {
         description: res.error.message,
       });
+    } else {
+      router.push("/welcome/login");
     }
 
     loading.end();

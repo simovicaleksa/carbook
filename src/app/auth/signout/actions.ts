@@ -1,7 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
-
 import { db } from "~/db";
 
 import {
@@ -9,7 +7,7 @@ import {
   getCurrentSession,
   invalidateSession,
 } from "~/lib/server/auth";
-import { responseError } from "~/lib/utils/response";
+import { responseError, responseSuccess } from "~/lib/utils/response";
 
 export async function signout() {
   try {
@@ -23,7 +21,7 @@ export async function signout() {
       await invalidateSession(session.id, { transaction: tx });
       await deleteSessionTokenCookie();
 
-      return redirect("/auth/login");
+      return responseSuccess();
     });
   } catch (error) {
     return responseError(error);

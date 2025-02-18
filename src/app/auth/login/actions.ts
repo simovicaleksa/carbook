@@ -1,7 +1,5 @@
 "use server";
 
-import { redirect } from "next/navigation";
-
 import { type z } from "zod";
 
 import { db } from "~/db";
@@ -14,7 +12,7 @@ import {
 import { verifyPasswordHash } from "~/lib/server/password";
 import { getUserFromUsernameOrEmail } from "~/lib/server/user";
 import { UserInputError } from "~/lib/utils/error";
-import { responseError } from "~/lib/utils/response";
+import { responseError, responseSuccess } from "~/lib/utils/response";
 
 import { loginSchema } from "./validators";
 
@@ -45,7 +43,7 @@ export async function login({
       });
       await setSessionTokenCookie(sessionToken, session.expiresAt);
 
-      return redirect("/welcome/login");
+      return responseSuccess({ user });
     });
   } catch (error) {
     return responseError(error);

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import { useForm } from "react-hook-form";
 
@@ -31,6 +32,7 @@ import LoadingButton from "../ui/loading-button";
 export default function SignupForm() {
   const isMobile = useIsMobile();
   const loading = useLoading();
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof signupSchema>>({
     resolver: zodResolver(signupSchema),
@@ -53,6 +55,8 @@ export default function SignupForm() {
       toast.error(`Error - ${res.status}`, {
         description: res.error.message,
       });
+    } else {
+      router.push("/welcome/signup");
     }
 
     loading.end();

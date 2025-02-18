@@ -1,5 +1,7 @@
 "use client";
 
+import { useRouter } from "next/navigation";
+
 import { User2 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -26,6 +28,7 @@ export default function SignOutDialog() {
   const loading = useLoading();
   const { isOpen, setIsOpen } = useSignoutDialog();
   const user = useUser();
+  const router = useRouter();
 
   const handleSignOut = async () => {
     loading.start();
@@ -36,6 +39,8 @@ export default function SignOutDialog() {
       toast.error(`Error - ${res.status}`, {
         description: res.error.message,
       });
+    } else {
+      router.push("/");
     }
 
     loading.end();
