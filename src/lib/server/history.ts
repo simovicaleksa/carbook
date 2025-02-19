@@ -1,3 +1,6 @@
+import { revalidateTag } from "next/cache";
+import { cacheTag } from "next/dist/server/use-cache/cache-tag";
+
 import { desc, eq } from "drizzle-orm";
 
 import { type addHistoryEventSchema } from "~/app/actions/history-validators";
@@ -17,6 +20,9 @@ export async function createHistoryEvent(
     })
     .returning();
 
+  revalidateTag(`vehicle-${vehicleId}-events`);
+  revalidateTag(`vehicle-${vehicleId}-latest-event`);
+
   return insertedEvent;
 }
 
@@ -25,6 +31,12 @@ export async function getHistoryEvents(
   page = 1,
   perPage = 20,
 ) {
+  "use cache";
+  cacheTag(
+    `vehicle-${vehicleId}-events`,
+    `vehicle-${vehicleId}-events-page-${page}-perPage-${perPage}`,
+  );
+
   return await db.query.historyTable.findMany({
     where: eq(historyTable.vehicleId, vehicleId),
     with: {
@@ -37,6 +49,8 @@ export async function getHistoryEvents(
 }
 
 export async function getHistoryEventsCount(vehicleId: string) {
+  "use cache";
+  cacheTag(`vehicle-${vehicleId}-events`);
   return await db.$count(historyTable, eq(historyTable.vehicleId, vehicleId));
 }
 
@@ -45,6 +59,9 @@ export async function updateHistoryEvent(
   event: Partial<typeof historyTable.$inferInsert>,
 ) {
   await db.update(historyTable).set(event).where(eq(historyTable.id, eventId));
+
+  revalidateTag(`vehicle-${event.vehicleId}-events`);
+  revalidateTag(`vehicle-${event.vehicleId}-latest-event`);
 
   const updatedEvent = await db.query.historyTable.findFirst({
     where: eq(historyTable.id, eventId),
@@ -57,10 +74,22 @@ export async function updateHistoryEvent(
 }
 
 export async function deleteHistoryEvent(eventId: number) {
-  await db.delete(historyTable).where(eq(historyTable.id, eventId));
+  const [deletedEvent] = await db
+    .delete(historyTable)
+    .where(eq(historyTable.id, eventId))
+    .returning();
+
+  if (deletedEvent) {
+    revalidateTag(`vehicle-${deletedEvent.vehicleId}-events`);
+    revalidateTag(`vehicle-${deletedEvent.vehicleId}-latest-event`);
+  }
+
+  return deletedEvent;
 }
 
 export async function getLatestHistoryEvent(vehicleId: string) {
+  "use cache";
+  cacheTag(`vehicle-${vehicleId}-latest-event`);
   const event = await db.query.historyTable.findFirst({
     where: eq(historyTable.vehicleId, vehicleId),
     orderBy: desc(historyTable.atDistanceTraveled),

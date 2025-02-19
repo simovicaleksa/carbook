@@ -1,5 +1,7 @@
 import { type Metadata } from "next";
 
+import { Suspense } from "react";
+
 import { GeistSans } from "geist/font/sans";
 
 import "~/styles/globals.css";
@@ -12,20 +14,22 @@ export const metadata: Metadata = {
   icons: [{ rel: "icon", url: "/favicon.svg" }],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${GeistSans.variable}`}>
       <body>
-        {children}
-        <Toaster
-          position="bottom-right"
-          theme="light"
-          duration={5000}
-          visibleToasts={6}
-          expand
-        />
+        <Suspense>
+          {children}
+          <Toaster
+            position="bottom-right"
+            theme="light"
+            duration={5000}
+            visibleToasts={6}
+            expand
+          />
+        </Suspense>
       </body>
     </html>
   );

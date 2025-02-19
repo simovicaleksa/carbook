@@ -1,12 +1,18 @@
+import { revalidateTag } from "next/cache";
+import { cacheTag } from "next/dist/server/use-cache/cache-tag";
+
 import { eq } from "drizzle-orm";
 import { type z } from "zod";
 
 import { type addVehicleSchema } from "~/app/actions/vehicle-validators";
 
 import { db } from "~/db";
-import { userProfileTable, vehicleTable } from "~/db/_schema";
+import { vehicleTable } from "~/db/_schema";
 
 export async function getVehicleFromId(vehicleId: string) {
+  "use cache";
+  cacheTag(`vehicle-${vehicleId}`);
+
   const [vehicle] = await db
     .select()
     .from(vehicleTable)
@@ -16,6 +22,9 @@ export async function getVehicleFromId(vehicleId: string) {
 }
 
 export async function getVehiclesFromUserId(userId: string) {
+  "use cache";
+  cacheTag(`user-${userId}-vehicles`);
+
   return await db
     .select()
     .from(vehicleTable)
@@ -48,6 +57,8 @@ export async function createVehicle(
     throw new Error("Failed to create vehicle");
   }
 
+  revalidateTag(`user-${userId}-vehicles`);
+
   return vehicle;
 }
 
@@ -65,23 +76,11 @@ export async function updateVehicle(
     .update(vehicleTable)
     .set(newVehicle)
     .where(eq(vehicleTable.id, vehicle.id));
+
+  revalidateTag(`vehicle-${vehicleId}`);
 }
 
 export async function deleteVehicle(vehicleId: string) {
   await db.delete(vehicleTable).where(eq(vehicleTable.id, vehicleId));
-}
-
-export async function getSelectedVehicleFromUserId(userId: string) {
-  const userProfile = await db.query.userProfileTable.findFirst({
-    where: eq(userProfileTable.userId, userId),
-    with: {
-      selectedVehicle: true,
-    },
-  });
-
-  if (!userProfile) {
-    throw new Error("User not found");
-  }
-
-  return userProfile.selectedVehicle;
+  revalidateTag(`vehicle-${vehicleId}`);
 }
