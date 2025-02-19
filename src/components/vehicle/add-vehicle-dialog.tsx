@@ -19,7 +19,7 @@ export default function AddVehicleDialog() {
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogContent className="max-w-2xl p-0">
-        <ScrollArea className="max-h-screen">
+        <ScrollArea className="max-h-[92vh]">
           <AlertDialogHeader className="p-5">
             <AlertDialogTitle>Add vehicle</AlertDialogTitle>
             <AlertDialogDescription>

@@ -19,7 +19,7 @@ export default function AddHistoryEventDialog() {
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
       <AlertDialogContent className="w-full max-w-3xl">
-        <ScrollArea className="max-h-screen">
+        <ScrollArea className="max-h-[92vh]">
           <AlertDialogHeader>
             <AlertDialogTitle>Add event</AlertDialogTitle>
             <AlertDialogDescription>

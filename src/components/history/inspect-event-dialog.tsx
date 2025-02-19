@@ -38,7 +38,7 @@ export default function InspectEventDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="w-full max-w-3xl p-0">
-        <ScrollArea className="max-h-screen">
+        <ScrollArea className="max-h-[92vh]">
           <DialogHeader className="mb-3 flex flex-col items-center gap-5 px-5 pt-10">
             <div className="flex flex-col items-center justify-center gap-2 text-center">
               <span className="flex size-fit flex-row items-center gap-2 rounded-lg bg-primary p-3 text-primary-foreground">
