@@ -8,6 +8,7 @@ import "./src/env.js";
 const config = {
   experimental: {
     useCache: true,
+    dynamicIO: true,
   },
 };
 
