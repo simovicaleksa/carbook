@@ -28,7 +28,7 @@ const coreItems = [
   },
   {
     title: "History",
-    url: "/dashboard/history",
+    url: "/dashboard/history?page=1",
     icon: <ChartNoAxesGantt />,
   },
   {
