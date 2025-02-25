@@ -42,7 +42,7 @@ export default function AppPagination({ perPage = 20 }: { perPage?: number }) {
               {page}
             </PaginationLink>
           </PaginationItem>
-          <PaginationNext href={nextPage} />
+          <PaginationNext href={nextPage} disabled={!hasNext} />
         </PaginationContent>
       </Pagination>
       <span className="text-sm text-muted-foreground">
