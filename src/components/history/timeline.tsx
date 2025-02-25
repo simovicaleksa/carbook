@@ -8,6 +8,7 @@ import {
   Edit,
   EllipsisVertical,
   Milestone,
+  PencilOff,
   Trash2,
 } from "lucide-react";
 
@@ -43,9 +44,22 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
+import { NoResults } from "../ui/no-results";
 
 export default function Timeline() {
   const { events } = useEvents();
+
+  if (events.length === 0) {
+    return (
+      <div className="mt-20">
+        <NoResults
+          title="No events found"
+          description="Add event to get started"
+          icon={PencilOff}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="relative size-full">
