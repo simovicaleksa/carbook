@@ -1,25 +1,14 @@
-import Link from "next/link";
-
 import {
-  BarChart,
   Bell,
   Cloud,
   FileText,
   FileUp,
   Goal,
   PieChart,
-  Share,
   Share2,
   Users,
   Wrench,
 } from "lucide-react";
-
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "~/components/ui/accordion";
 
 const features = [
   {
