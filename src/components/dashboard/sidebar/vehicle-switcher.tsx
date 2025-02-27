@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronsUpDown, Plus } from "lucide-react";
+import { ChevronsUpDown, Loader2, Plus } from "lucide-react";
 
 import { cn } from "~/lib/utils";
 import { getBrandIcon } from "~/lib/utils/icon";
@@ -32,7 +32,7 @@ export default function VehicleSwitcher() {
   const isMobile = useIsMobile();
   const { toggleOpen } = useAddVehicleDialog();
   const { vehicles } = useUserVehicles();
-  const { selectedVehicle } = useSelectedVehicle();
+  const { selectedVehicle, isLoading } = useSelectedVehicle();
   const Icon = getBrandIcon(selectedVehicle);
 
   return (
@@ -41,8 +41,19 @@ export default function VehicleSwitcher() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton size={"lg"}>
-              <div className="flex size-8 flex-row items-center justify-center rounded-[var(--radius)] bg-sidebar-primary text-sidebar-primary-foreground">
-                <Icon />
+              <div
+                className={cn(
+                  "flex size-8 flex-row items-center justify-center rounded-[var(--radius)] bg-primary text-sidebar-primary-foreground",
+                  {
+                    "bg-background": isLoading,
+                  },
+                )}
+              >
+                {isLoading ? (
+                  <Loader2 className="animate-spin text-foreground" />
+                ) : (
+                  <Icon />
+                )}
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-normal">

@@ -17,12 +17,15 @@ import { updateUserSelectedVehicle } from "~/app/dashboard/actions";
 
 import { type vehicleTable } from "~/db/_schema";
 
+import { useLoading } from "~/hooks/use-loading";
+
 export type VehicleType = InferSelectModel<typeof vehicleTable>;
 
 type SidebarSelectedVehicleType = {
   selectedVehicle: VehicleType | null;
   setSelectedVehicle: Dispatch<SetStateAction<VehicleType | null>>;
   changeSelectedVehicle: (vehicle: VehicleType) => Promise<void>;
+  isLoading: boolean;
 };
 
 const SelectedVehicleContext = createContext<SidebarSelectedVehicleType | null>(
@@ -36,6 +39,7 @@ export function SelectedVehicleProvider({
   children: React.ReactNode;
   defaultValue: InferSelectModel<typeof vehicleTable> | null;
 }) {
+  const loading = useLoading();
   const [selectedVehicle, setSelectedVehicle] = useState<VehicleType | null>(
     null,
   );
@@ -44,19 +48,26 @@ export function SelectedVehicleProvider({
 
   useEffect(() => {
     setSelectedVehicle(defaultValue);
-  }, [defaultValue]);
+  }, [defaultValue, loading]);
 
   async function changeSelectedVehicle(newSelectedVehicle: VehicleType) {
+    loading.start();
     const res = await updateUserSelectedVehicle(newSelectedVehicle.id);
     if (res.ok) {
       setSelectedVehicle(newSelectedVehicle);
       router.refresh();
     }
+    loading.end();
   }
 
   return (
     <SelectedVehicleContext.Provider
-      value={{ selectedVehicle, changeSelectedVehicle, setSelectedVehicle }}
+      value={{
+        selectedVehicle,
+        changeSelectedVehicle,
+        setSelectedVehicle,
+        isLoading: loading.isLoading,
+      }}
     >
       {children}
     </SelectedVehicleContext.Provider>
