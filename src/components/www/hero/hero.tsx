@@ -58,7 +58,7 @@ export default function Hero() {
           </Badge>
           <h1 className="mt-6 max-w-[17ch] text-4xl font-bold !leading-[1.2] tracking-tight md:text-5xl lg:text-[2.75rem] xl:text-5xl">
             Track Your{" "}
-            <span className="font-black text-primary">Car History</span> with
+            <span className="font-black text-primary">Car History</span> With
             Ease
           </h1>
           <p className="mt-6 max-w-[60ch] text-lg">
@@ -78,7 +78,7 @@ export default function Hero() {
             </Button>
           </div>
         </div>
-        <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-accent lg:aspect-auto lg:h-screen lg:w-[1000px] lg:rounded-none lg:rounded-l-[190px]">
+        <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-accent lg:aspect-auto lg:h-screen lg:w-[1000px] lg:rounded-none">
           <Image
             src={
               "https://raw.githubusercontent.com/simovicaleksa/assets/refs/heads/main/carbook/bmw-car.jpg"
