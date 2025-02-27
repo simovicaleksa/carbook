@@ -8,7 +8,8 @@ import {
   SheetTrigger,
 } from "~/components/ui/sheet";
 
-import Logo from "./logo";
+import Logo from "../logo/logo";
+
 import NavMenu from "./nav-menu";
 
 export default function NavigationSheet() {
