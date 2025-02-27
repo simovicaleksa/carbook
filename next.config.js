@@ -10,6 +10,15 @@ const config = {
     useCache: true,
     dynamicIO: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        hostname: "raw.githubusercontent.com",
+        protocol: "https",
+        pathname: "/simovicaleksa/assets/**",
+      },
+    ],
+  },
 };
 
 export default config;
