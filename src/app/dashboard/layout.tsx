@@ -10,7 +10,6 @@ import { UserProvider } from "~/context/user-context";
 import { UserProfileProvider } from "~/context/user-profile-context";
 import { UserVehiclesProvider } from "~/context/user-vehicles-context";
 
-import BackToTop from "~/components/dashboard/layout/back-to-top";
 import AppSidebar from "~/components/dashboard/sidebar/app-sidebar";
 import { SidebarProvider } from "~/components/ui/sidebar";
 
@@ -50,7 +49,6 @@ export default async function DashboardLayout({
                   <SidebarProvider>
                     <AppSidebar />
                     {children}
-                    <BackToTop />
                   </SidebarProvider>
                 </AddHistoryEventDialogProvider>
               </AddVehicleDialogProvider>

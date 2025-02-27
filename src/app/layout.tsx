@@ -5,6 +5,7 @@ import { Suspense } from "react";
 
 import "~/styles/globals.css";
 
+import BackToTop from "~/components/dashboard/layout/back-to-top";
 import { Toaster } from "~/components/ui/sonner";
 
 export const metadata: Metadata = {
@@ -35,6 +36,7 @@ export default async function RootLayout({
     >
       <body>
         <Suspense>
+          <BackToTop />
           {children}
           <Toaster
             position="bottom-right"
