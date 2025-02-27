@@ -3,8 +3,6 @@
 import { and, desc, eq, gt, lt } from "drizzle-orm";
 import { type z } from "zod";
 
-import { addHistoryEventSchema } from "~/app/actions/history-validators";
-
 import { db } from "~/db";
 import { historyTable, vehicleTable } from "~/db/_schema";
 
@@ -26,6 +24,7 @@ import { updateVehicle } from "~/lib/server/vehicle";
 import { NotFoundError, UserInputError } from "~/lib/utils/error";
 import { responseError, responseSuccess } from "~/lib/utils/response";
 import { convertToMetric } from "~/lib/utils/units";
+import { addHistoryEventSchema } from "~/lib/validators/history-validators";
 
 export async function createUserHistoryEvent(
   vehicleId: string,

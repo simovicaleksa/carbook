@@ -4,7 +4,7 @@ import { type UseFormReturn } from "react-hook-form";
 
 import { type z } from "zod";
 
-import { type addHistoryEventSchema } from "~/app/actions/history-validators";
+import { type addHistoryEventSchema } from "~/lib/validators/history-validators";
 
 import { useUserProfile } from "~/context/user-profile-context";
 

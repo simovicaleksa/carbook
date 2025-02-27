@@ -22,8 +22,8 @@ import {
 import { NotFoundError, UserInputError } from "~/lib/utils/error";
 import { responseError, responseSuccess } from "~/lib/utils/response";
 
-import { userProfileSchema } from "../actions/user-profile-validators";
-import { addVehicleSchema } from "../actions/vehicle-validators";
+import { userProfileSchema } from "../../lib/validators/user-profile-validators";
+import { addVehicleSchema } from "../../lib/validators/vehicle-validators";
 
 export async function getUserVehicles() {
   try {

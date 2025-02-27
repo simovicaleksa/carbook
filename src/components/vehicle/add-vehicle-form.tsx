@@ -6,10 +6,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { type z } from "zod";
 
-import { addVehicleSchema } from "~/app/actions/vehicle-validators";
 import { createUserVehicle } from "~/app/dashboard/actions";
 
 import { cn } from "~/lib/utils";
+import { addVehicleSchema } from "~/lib/validators/vehicle-validators";
 
 import { useAddVehicleDialog } from "~/context/add-vehicle-dialog-context";
 

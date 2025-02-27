@@ -9,10 +9,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { type z } from "zod";
 
-import { addVehicleSchema } from "~/app/actions/vehicle-validators";
 import { updateUserVehicle } from "~/app/dashboard/actions";
 
 import { cn } from "~/lib/utils";
+import { addVehicleSchema } from "~/lib/validators/vehicle-validators";
 
 import { useSelectedVehicle } from "~/context/selected-vehicle-context";
 import { useUserProfile } from "~/context/user-profile-context";

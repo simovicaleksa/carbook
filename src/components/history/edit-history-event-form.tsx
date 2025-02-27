@@ -6,10 +6,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { type z } from "zod";
 
-import { addHistoryEventSchema } from "~/app/actions/history-validators";
 import { updateVehicleHistoryEvent } from "~/app/dashboard/history/actions";
 
 import { cn } from "~/lib/utils";
+import { addHistoryEventSchema } from "~/lib/validators/history-validators";
 
 import { useEditHistoryDialog } from "~/context/edit-history-dialog-context";
 import { type EventType } from "~/context/events-context";

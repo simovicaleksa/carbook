@@ -4,10 +4,10 @@ import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 import { eq } from "drizzle-orm";
 import { type z } from "zod";
 
-import { type addVehicleSchema } from "~/app/actions/vehicle-validators";
-
 import { db } from "~/db";
 import { vehicleTable } from "~/db/_schema";
+
+import { type addVehicleSchema } from "~/lib/validators/vehicle-validators";
 
 export async function getVehicleFromId(vehicleId: string) {
   "use cache";

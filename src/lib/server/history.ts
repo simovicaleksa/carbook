@@ -3,10 +3,10 @@ import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
 import { desc, eq } from "drizzle-orm";
 
-import { type addHistoryEventSchema } from "~/app/actions/history-validators";
-
 import { db } from "~/db";
 import { historyTable } from "~/db/_schema";
+
+import { type addHistoryEventSchema } from "~/lib/validators/history-validators";
 
 export async function createHistoryEvent(
   vehicleId: string,

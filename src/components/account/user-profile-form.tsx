@@ -8,10 +8,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { type z } from "zod";
 
-import { userProfileSchema } from "~/app/actions/user-profile-validators";
 import { updateUserProfile } from "~/app/dashboard/actions";
 
 import { cn } from "~/lib/utils";
+import { userProfileSchema } from "~/lib/validators/user-profile-validators";
 
 import { useUser } from "~/context/user-context";
 import { useUserProfile } from "~/context/user-profile-context";
