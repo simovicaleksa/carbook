@@ -36,6 +36,7 @@ export default function Hero() {
             sizes="(max-width): 768px 100vw, (max-width: 1024px) 50vw"
             alt="Blue bmw sedan near green lawn grass"
             className="size-full object-cover lg:object-left"
+            priority
           />
           <div
             className={cn(
