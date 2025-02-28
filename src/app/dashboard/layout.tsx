@@ -12,6 +12,7 @@ import { UserVehiclesProvider } from "~/context/user-vehicles-context";
 
 import AppSidebar from "~/components/dashboard/sidebar/app-sidebar";
 import { SidebarProvider } from "~/components/ui/sidebar";
+import { Toaster } from "~/components/ui/sonner";
 
 import {
   getUserProfile,
@@ -49,6 +50,13 @@ export default async function DashboardLayout({
                   <SidebarProvider>
                     <AppSidebar />
                     {children}
+                    <Toaster
+                      position="bottom-right"
+                      theme="light"
+                      duration={5000}
+                      visibleToasts={6}
+                      expand
+                    />
                   </SidebarProvider>
                 </AddHistoryEventDialogProvider>
               </AddVehicleDialogProvider>

@@ -6,7 +6,6 @@ import { Suspense } from "react";
 import "~/styles/globals.css";
 
 import BackToTop from "~/components/dashboard/layout/back-to-top";
-import { Toaster } from "~/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Car Book",
@@ -38,13 +37,6 @@ export default async function RootLayout({
         <Suspense>
           <BackToTop />
           {children}
-          <Toaster
-            position="bottom-right"
-            theme="light"
-            duration={5000}
-            visibleToasts={6}
-            expand
-          />
         </Suspense>
       </body>
     </html>
