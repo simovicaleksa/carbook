@@ -16,7 +16,7 @@ import {
 } from "~/components/ui/pagination";
 
 export default function AppPagination({ perPage = 10 }: { perPage?: number }) {
-  const { getParam, setParam, createQueryString, pathname } = useUrl();
+  const { getParam, setParams, createQueryString, pathname } = useUrl();
   const page = Number(getParam("page")) ?? 1;
   const { total } = useEvents();
 
@@ -29,8 +29,14 @@ export default function AppPagination({ perPage = 10 }: { perPage?: number }) {
   const nextPage = `${pathname}?${createQueryString("page", String(hasNext ? page + 1 : maxPage))}`;
 
   useEffect(() => {
-    if (!page) setParam("page", "1", "replace");
-  }, [page, setParam]);
+    if (!page)
+      setParams(
+        {
+          page: "1",
+        },
+        "replace",
+      );
+  }, [page, setParams]);
 
   return (
     <div className="mx-auto flex w-fit flex-col items-center justify-center gap-2">

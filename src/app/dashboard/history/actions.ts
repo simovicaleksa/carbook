@@ -128,6 +128,9 @@ export async function getVehicleHistoryEvents(
   vehicleId: string,
   page = 1,
   perPage = 10,
+  sortBy?: "newest" | "oldest",
+  filters?: string,
+  search?: string,
 ) {
   try {
     await authorize(async (user) => {
@@ -140,8 +143,16 @@ export async function getVehicleHistoryEvents(
       return true;
     });
 
-    const events = await getHistoryEvents(vehicleId, page, perPage);
-    const total = await getHistoryEventsCount(vehicleId);
+    const events = await getHistoryEvents(
+      vehicleId,
+      page,
+      perPage,
+      sortBy,
+      filters,
+      search,
+    );
+
+    const total = await getHistoryEventsCount(vehicleId, filters, search);
 
     const responseObject = {
       events,

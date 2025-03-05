@@ -1,7 +1,7 @@
 import { revalidateTag } from "next/cache";
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, or } from "drizzle-orm";
 
 import { db } from "~/db";
 import { historyTable } from "~/db/_schema";
@@ -33,21 +33,26 @@ export async function getHistoryEvents(
   page = 1,
   perPage = 10,
   sortBy: "newest" | "oldest" = "newest",
-  filterType: HistoryEntryType | "all" = "all",
+  filterType?: string,
+  search?: string,
 ) {
-  "use cache";
-  cacheTag(
-    `vehicle-${vehicleId}-events`,
-    // `vehicle-${vehicleId}-events-page-${page}-perPage-${perPage}`,
-  );
+  const filters = filterType
+    ? (decodeURIComponent(filterType)
+        .split(",")
+        .map((filter) => filter.trim())
+        .filter((filter) => filter.length > 0) as HistoryEntryType[])
+    : [];
 
-  const where =
-    filterType === "all"
-      ? eq(historyTable.vehicleId, vehicleId)
-      : and(
-          eq(historyTable.vehicleId, vehicleId),
-          eq(historyTable.type, filterType),
-        );
+  const where = and(
+    eq(historyTable.vehicleId, vehicleId),
+    filters.length > 0 ? inArray(historyTable.type, filters) : undefined,
+    search?.length
+      ? or(
+          ilike(historyTable.description, search),
+          ilike(historyTable.type, search),
+        )
+      : undefined,
+  );
 
   const orderBy =
     sortBy === "oldest" ? asc(historyTable.date) : desc(historyTable.date);
@@ -63,10 +68,32 @@ export async function getHistoryEvents(
   });
 }
 
-export async function getHistoryEventsCount(vehicleId: string) {
-  "use cache";
-  cacheTag(`vehicle-${vehicleId}-events`);
-  return await db.$count(historyTable, eq(historyTable.vehicleId, vehicleId));
+export async function getHistoryEventsCount(
+  vehicleId: string,
+  filterType?: string,
+  search?: string,
+) {
+  const filters = filterType
+    ? (decodeURIComponent(filterType)
+        .split(",")
+        .map((filter) => filter.trim())
+        .filter((filter) => filter.length > 0) as HistoryEntryType[])
+    : [];
+
+  const where = and(
+    eq(historyTable.vehicleId, vehicleId),
+    filters.length > 0 ? inArray(historyTable.type, filters) : undefined,
+    search?.length
+      ? or(
+          ilike(historyTable.description, search),
+          ilike(historyTable.type, search),
+        )
+      : undefined,
+  );
+
+  return await db.$count(historyTable, where);
+
+  // return await db.$count(historyTable, eq(historyTable.vehicleId, vehicleId));
 }
 
 export async function updateHistoryEvent(

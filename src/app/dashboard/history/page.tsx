@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { EventsProvider } from "~/context/events-context";
+import { HistoryEventFiltersProvider } from "~/context/history-event-filters-context";
 
 import {
   AppLayout,
@@ -22,6 +23,9 @@ const PER_PAGE = 10;
 export default async function History(props: {
   searchParams: Promise<{
     page?: number;
+    sortBy?: "newest" | "oldest";
+    filters?: string;
+    search?: string;
   }>;
 }) {
   const searchParams = await props.searchParams;
@@ -34,26 +38,31 @@ export default async function History(props: {
     selectedVehicle.id,
     searchParams?.page ?? 1,
     PER_PAGE,
+    searchParams.sortBy,
+    searchParams.filters,
+    searchParams.search,
   );
 
   return (
-    <EventsProvider
-      events={historyEvents?.events ?? []}
-      total={historyEvents?.total ?? 0}
-    >
-      <AppLayout>
-        <AppLayoutHeader
-          title="History"
-          action={<AddHistoryEventHeaderButton />}
-        />
-        <AppLayoutContent>
-          <HistoryFilters />
-          <Timeline />
-        </AppLayoutContent>
-        <AppLayoutFooter>
-          <AppPagination perPage={PER_PAGE} />
-        </AppLayoutFooter>
-      </AppLayout>
-    </EventsProvider>
+    <HistoryEventFiltersProvider>
+      <EventsProvider
+        events={historyEvents?.events ?? []}
+        total={historyEvents?.total ?? 0}
+      >
+        <AppLayout>
+          <AppLayoutHeader
+            title="History"
+            action={<AddHistoryEventHeaderButton />}
+          />
+          <AppLayoutContent>
+            <HistoryFilters />
+            <Timeline />
+          </AppLayoutContent>
+          <AppLayoutFooter>
+            <AppPagination perPage={PER_PAGE} />
+          </AppLayoutFooter>
+        </AppLayout>
+      </EventsProvider>
+    </HistoryEventFiltersProvider>
   );
 }
