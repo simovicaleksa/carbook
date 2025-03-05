@@ -15,7 +15,7 @@ import {
   PaginationPrevious,
 } from "~/components/ui/pagination";
 
-export default function AppPagination({ perPage = 20 }: { perPage?: number }) {
+export default function AppPagination({ perPage = 10 }: { perPage?: number }) {
   const { getParam, setParam, createQueryString, pathname } = useUrl();
   const page = Number(getParam("page")) ?? 1;
   const { total } = useEvents();

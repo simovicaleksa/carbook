@@ -127,7 +127,7 @@ export async function createUserHistoryEvent(
 export async function getVehicleHistoryEvents(
   vehicleId: string,
   page = 1,
-  perPage = 20,
+  perPage = 10,
 ) {
   try {
     await authorize(async (user) => {

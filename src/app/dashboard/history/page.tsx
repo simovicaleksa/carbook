@@ -10,13 +10,14 @@ import {
 } from "~/components/dashboard/layout/app-layout";
 import AppPagination from "~/components/dashboard/layout/app-pagination";
 import AddHistoryEventHeaderButton from "~/components/history/add-history-event-header-button";
+import HistoryFilters from "~/components/history/history-filters";
 import Timeline from "~/components/history/timeline";
 
 import { getCurrentSelectedVehicle } from "../actions";
 
 import { getVehicleHistoryEvents } from "./actions";
 
-const PER_PAGE = 20;
+const PER_PAGE = 10;
 
 export default async function History(props: {
   searchParams: Promise<{
@@ -46,6 +47,7 @@ export default async function History(props: {
           action={<AddHistoryEventHeaderButton />}
         />
         <AppLayoutContent>
+          <HistoryFilters />
           <Timeline />
         </AppLayoutContent>
         <AppLayoutFooter>
