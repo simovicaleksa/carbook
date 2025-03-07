@@ -24,7 +24,7 @@ import { updateVehicle } from "~/lib/server/vehicle";
 import { NotFoundError, UserInputError } from "~/lib/utils/error";
 import { responseError, responseSuccess } from "~/lib/utils/response";
 import { convertToMetric } from "~/lib/utils/units";
-import { addHistoryEventSchema } from "~/lib/validators/history-validators";
+import { addHistoryEventSchema } from "~/lib/validators/history";
 
 export async function createUserHistoryEvent(
   vehicleId: string,

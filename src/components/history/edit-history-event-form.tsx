@@ -9,7 +9,7 @@ import { type z } from "zod";
 import { updateVehicleHistoryEvent } from "~/app/(dashboard)/dashboard/history/actions";
 
 import { cn } from "~/lib/utils";
-import { addHistoryEventSchema } from "~/lib/validators/history-validators";
+import { addHistoryEventSchema } from "~/lib/validators/history";
 
 import { useEditHistoryDialog } from "~/context/edit-history-dialog-context";
 import { type EventType } from "~/context/events-context";

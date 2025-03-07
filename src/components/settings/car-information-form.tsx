@@ -12,7 +12,7 @@ import { type z } from "zod";
 import { updateUserVehicle } from "~/app/(dashboard)/dashboard/actions";
 
 import { cn } from "~/lib/utils";
-import { addVehicleSchema } from "~/lib/validators/vehicle-validators";
+import { addVehicleSchema } from "~/lib/validators/vehicle";
 
 import { useSelectedVehicle } from "~/context/selected-vehicle-context";
 import { useUserProfile } from "~/context/user-profile-context";

@@ -11,7 +11,7 @@ import { type z } from "zod";
 import { updateUserProfile } from "~/app/(dashboard)/dashboard/actions";
 
 import { cn } from "~/lib/utils";
-import { userProfileSchema } from "~/lib/validators/user-profile-validators";
+import { userProfileSchema } from "~/lib/validators/user-profile";
 
 import { useUser } from "~/context/user-context";
 import { useUserProfile } from "~/context/user-profile-context";

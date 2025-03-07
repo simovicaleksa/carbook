@@ -35,16 +35,19 @@ const coreItems = [
     title: "Statistics",
     url: "/dashboard/statistics",
     icon: <ChartLine />,
+    comingSoon: true,
   },
   {
     title: "Upcoming",
-    url: "/dashboard/reminders",
+    url: "/dashboard/upcoming",
     icon: <Bell />,
+    comingSoon: true,
   },
   {
     title: "Invites",
     url: "/dashboard/invites",
     icon: <Mail />,
+    comingSoon: true,
   },
   {
     title: "Settings",
@@ -67,6 +70,7 @@ export default function SidebarCoreNav() {
               icon={item.icon}
               href={item.url}
               active={pathname === item.url}
+              commingSoon={item.comingSoon}
             >
               {item.title}
             </SidebarLinkButton>

@@ -7,7 +7,7 @@ import { type z } from "zod";
 import { db } from "~/db";
 import { vehicleTable } from "~/db/_schema";
 
-import { type addVehicleSchema } from "~/lib/validators/vehicle-validators";
+import { type addVehicleSchema } from "~/lib/validators/vehicle";
 
 export async function getVehicleFromId(vehicleId: string) {
   "use cache";

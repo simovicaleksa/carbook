@@ -6,7 +6,7 @@ import { and, asc, desc, eq, ilike, inArray, or } from "drizzle-orm";
 import { db } from "~/db";
 import { historyTable } from "~/db/_schema";
 
-import { type addHistoryEventSchema } from "~/lib/validators/history-validators";
+import { type addHistoryEventSchema } from "~/lib/validators/history";
 
 import { type HistoryEntryType } from "~/types/history";
 

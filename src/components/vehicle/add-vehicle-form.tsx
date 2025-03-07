@@ -9,7 +9,7 @@ import { type z } from "zod";
 import { createUserVehicle } from "~/app/(dashboard)/dashboard/actions";
 
 import { cn } from "~/lib/utils";
-import { addVehicleSchema } from "~/lib/validators/vehicle-validators";
+import { addVehicleSchema } from "~/lib/validators/vehicle";
 
 import { useAddVehicleDialog } from "~/context/add-vehicle-dialog-context";
 

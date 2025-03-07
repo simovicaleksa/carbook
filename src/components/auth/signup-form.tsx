@@ -8,10 +8,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { type z } from "zod";
 
-import { signUp } from "~/app/auth/signup/actions";
-import { signupSchema } from "~/app/auth/signup/validators";
+import { signUp } from "~/app/(dashboard)/auth/signup/actions";
 
 import { cn } from "~/lib/utils";
+import { signupSchema } from "~/lib/validators/signup";
 
 import { useLoading } from "~/hooks/use-loading";
 import { useIsMobile } from "~/hooks/use-mobile";
