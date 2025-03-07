@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation";
+import { redirect } from "next/navigation";
 
 import { EventsProvider } from "~/context/events-context";
 import { HistoryEventFiltersProvider } from "~/context/history-event-filters-context";
