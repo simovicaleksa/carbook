@@ -10,7 +10,7 @@ import SignupForm from "./signup-form";
 
 export default function SignupCard() {
   return (
-    <Card className="max-w-xl">
+    <Card className="w-full max-w-3xl">
       <CardHeader>
         <CardTitle>Sign up</CardTitle>
         <CardDescription>
