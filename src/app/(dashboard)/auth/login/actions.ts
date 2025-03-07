@@ -13,8 +13,7 @@ import { verifyPasswordHash } from "~/lib/server/password";
 import { getUserFromUsernameOrEmail } from "~/lib/server/user";
 import { UserInputError } from "~/lib/utils/error";
 import { responseError } from "~/lib/utils/response";
-
-import { loginSchema } from "./validators";
+import { loginSchema } from "~/lib/validators/login";
 
 export async function login({
   username,

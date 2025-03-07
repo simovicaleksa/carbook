@@ -50,13 +50,6 @@ export default async function DashboardLayout({
                   <SidebarProvider>
                     <AppSidebar />
                     {children}
-                    <Toaster
-                      position="bottom-right"
-                      theme="light"
-                      duration={5000}
-                      visibleToasts={6}
-                      expand
-                    />
                   </SidebarProvider>
                 </AddHistoryEventDialogProvider>
               </AddVehicleDialogProvider>

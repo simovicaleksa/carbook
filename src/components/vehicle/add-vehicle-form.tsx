@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { type z } from "zod";
 
-import { createUserVehicle } from "~/app/dashboard/actions";
+import { createUserVehicle } from "~/app/(dashboard)/dashboard/actions";
 
 import { cn } from "~/lib/utils";
 import { addVehicleSchema } from "~/lib/validators/vehicle-validators";

@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { type z } from "zod";
 
-import { updateUserVehicle } from "~/app/dashboard/actions";
+import { updateUserVehicle } from "~/app/(dashboard)/dashboard/actions";
 
 import { cn } from "~/lib/utils";
 import { addVehicleSchema } from "~/lib/validators/vehicle-validators";

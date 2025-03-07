@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { type z } from "zod";
 
-import { createUserHistoryEvent } from "~/app/dashboard/history/actions";
+import { createUserHistoryEvent } from "~/app/(dashboard)/dashboard/history/actions";
 
 import { cn } from "~/lib/utils";
 import { addHistoryEventSchema } from "~/lib/validators/history-validators";

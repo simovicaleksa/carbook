@@ -6,7 +6,7 @@ import { useState } from "react";
 
 import { toast } from "sonner";
 
-import { deleteVehicleHistoryEvent } from "~/app/dashboard/history/actions";
+import { deleteVehicleHistoryEvent } from "~/app/(dashboard)/dashboard/history/actions";
 
 import { useDeleteEventDialog } from "~/context/delete-event-dialog-context";
 import { useEditHistoryDialog } from "~/context/edit-history-dialog-context";

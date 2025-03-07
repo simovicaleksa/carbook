@@ -11,8 +11,7 @@ import {
 } from "~/lib/server/auth";
 import { createUser } from "~/lib/server/user";
 import { responseError } from "~/lib/utils/response";
-
-import { signupSchema } from "./validators";
+import { signupSchema } from "~/lib/validators/signup";
 
 export async function signUp(signupUser: z.infer<typeof signupSchema>) {
   try {

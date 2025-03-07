@@ -13,7 +13,7 @@ import {
 
 import { type InferSelectModel } from "drizzle-orm";
 
-import { updateUserSelectedVehicle } from "~/app/dashboard/actions";
+import { updateUserSelectedVehicle } from "~/app/(dashboard)/dashboard/actions";
 
 import { type vehicleTable } from "~/db/_schema";
 

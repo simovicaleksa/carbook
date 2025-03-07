@@ -3,7 +3,7 @@
 import { User2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { signout } from "~/app/auth/signout/actions";
+import { signout } from "~/app/(dashboard)/auth/signout/actions";
 
 import { useSignoutDialog } from "~/context/signout-dialog-context";
 import { useUser } from "~/context/user-context";
