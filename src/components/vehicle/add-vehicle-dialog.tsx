@@ -11,7 +11,7 @@ import {
 } from "../ui/alert-dialog";
 import { ScrollArea } from "../ui/scroll-area";
 
-import AddVehicleForm from "./add-vehicle-form";
+import AddVehicleDialogForm from "./add-vehicle-dialog-form";
 
 export default function AddVehicleDialog() {
   const { isOpen, setIsOpen } = useAddVehicleDialog();
@@ -27,7 +27,7 @@ export default function AddVehicleDialog() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="p-5">
-            <AddVehicleForm />
+            <AddVehicleDialogForm />
           </div>
         </ScrollArea>
       </AlertDialogContent>

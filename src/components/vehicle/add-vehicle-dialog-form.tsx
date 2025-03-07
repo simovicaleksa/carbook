@@ -18,19 +18,14 @@ import { useAddVehicleDialog } from "~/context/add-vehicle-dialog-context";
 import { useLoading } from "~/hooks/use-loading";
 import { useIsMobile } from "~/hooks/use-mobile";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import { AlertDialogCancel, AlertDialogFooter } from "../ui/alert-dialog";
+import { Button } from "../ui/button";
 import { Form } from "../ui/form";
 import LoadingButton from "../ui/loading-button";
 
 import AddVehicleFields from "./add-vehicle-fields";
 
-export default function AddVehicleForm() {
+export default function AddVehicleDialogForm() {
   const loading = useLoading();
   const isMobile = useIsMobile();
   const router = useRouter();
@@ -68,33 +63,29 @@ export default function AddVehicleForm() {
   });
 
   return (
-    <Card className="max-w-3xl">
-      <CardHeader>
-        <CardTitle>Add Vehicle</CardTitle>
-        <CardDescription>Add a new vehicle to your account</CardDescription>
-      </CardHeader>
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)}>
-          <CardContent
-            className={cn("grid grid-cols-2 gap-2 space-y-5", {
-              "grid-cols-1": isMobile,
-            })}
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className={cn("grid grid-cols-2 gap-2 space-y-5", {
+          "grid-cols-1": isMobile,
+        })}
+      >
+        <AddVehicleFields form={form} />
+        <AlertDialogFooter className="col-span-full">
+          <AlertDialogCancel asChild>
+            <Button variant={"outline"} type="button">
+              Cancel
+            </Button>
+          </AlertDialogCancel>
+          <LoadingButton
+            isLoading={loading.isLoading}
+            type="submit"
+            loadingText="Adding vehicle"
           >
-            <AddVehicleFields form={form} />
-
-            <div className="col-span-full flex flex-row justify-end">
-              <LoadingButton
-                isLoading={loading.isLoading}
-                type="submit"
-                loadingText="Adding vehicle"
-                className="w-fit"
-              >
-                Add vehicle
-              </LoadingButton>
-            </div>
-          </CardContent>
-        </form>
-      </Form>
-    </Card>
+            Add vehicle
+          </LoadingButton>
+        </AlertDialogFooter>
+      </form>
+    </Form>
   );
 }
