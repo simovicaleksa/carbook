@@ -26,22 +26,12 @@ export async function login({
 
     if (!user) {
       throw new UserInputError("Invalid username or password");
-      // return {
-      //   ok: false,
-      //   status: 401,
-      //   error: new Error("Invalid username or password"),
-      // };
     }
 
     const passwordsMatch = await verifyPasswordHash(user.password, password);
 
-    if (!passwordsMatch) {
-      return {
-        ok: false,
-        status: 401,
-        error: new Error("Invalid username or password"),
-      };
-    }
+    if (!passwordsMatch)
+      throw new UserInputError("Invalid username or password");
 
     const sessionToken = generateSessionToken();
     const session = await createSession(sessionToken, user.id);

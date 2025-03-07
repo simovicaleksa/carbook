@@ -5,7 +5,7 @@ import { AuthorizationError, NotFoundError, UserInputError } from "./error";
 export type ErrorResponseType = {
   ok: false;
   status: 400 | 401 | 404 | 500;
-  error: Error | ZodError | NotFoundError | UserInputError | AuthorizationError;
+  error: string;
   data?: undefined;
 };
 
@@ -21,34 +21,34 @@ export function responseError(error: unknown): ErrorResponseType {
     return {
       ok: false,
       status: 401,
-      error: error,
+      error: "Unauthorized",
     };
   }
   if (error instanceof ZodError) {
     return {
       ok: false,
       status: 400,
-      error: error,
+      error: "Invalid input",
     };
   }
   if (error instanceof NotFoundError) {
     return {
       ok: false,
       status: 404,
-      error: error,
+      error: "Resource not found",
     };
   }
   if (error instanceof UserInputError) {
     return {
       ok: false,
       status: 400,
-      error: error,
+      error: error.message,
     };
   }
   return {
     ok: false,
     status: 500,
-    error: error as Error,
+    error: "Something went wrong, try again later",
   };
 }
 

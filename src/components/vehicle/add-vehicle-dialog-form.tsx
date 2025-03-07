@@ -38,7 +38,7 @@ export default function AddVehicleDialogForm() {
 
     if (!res.ok) {
       toast.error("Error", {
-        description: res.error.message,
+        description: res.error,
       });
     } else {
       toast.success("Success", {

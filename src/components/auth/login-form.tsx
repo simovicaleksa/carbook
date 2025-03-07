@@ -44,7 +44,7 @@ export default function LoginForm() {
 
     if (res.error) {
       toast.error(`Error - ${res.status}`, {
-        description: res.error.message,
+        description: res.error,
       });
     }
 

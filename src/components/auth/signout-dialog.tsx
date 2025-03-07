@@ -34,7 +34,7 @@ export default function SignOutDialog() {
 
     if (res.error) {
       toast.error(`Error - ${res.status}`, {
-        description: res.error.message,
+        description: res.error,
       });
     }
 
