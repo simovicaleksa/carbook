@@ -2,7 +2,6 @@ import Link from "next/link";
 
 import { cn } from "~/lib/utils";
 
-import { Badge } from "~/components/ui/badge";
 import { SidebarMenuButton, SidebarMenuItem } from "~/components/ui/sidebar";
 
 export default function SidebarLinkButton({
@@ -29,11 +28,6 @@ export default function SidebarLinkButton({
           {icon}
           <span className="flex w-full items-center justify-between">
             {children}
-            {commingSoon && (
-              <Badge className="rounded text-xs" variant={"outline"}>
-                Coming Soon
-              </Badge>
-            )}
           </span>
         </Link>
       </SidebarMenuButton>
