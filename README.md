@@ -43,6 +43,11 @@ You can track the following:
 ## Auth
 ![image](https://github.com/user-attachments/assets/4861b345-630d-4541-8214-f4126284ba4e)
 
+## Landing page
+![image](https://github.com/user-attachments/assets/39cb7a5d-dba5-4600-9007-0455137a9a3b)
+
+## Features section
+![image](https://github.com/user-attachments/assets/a89ac1c0-9d5a-4ab1-bb6d-5a304a339181)
 
 # TODO
 
