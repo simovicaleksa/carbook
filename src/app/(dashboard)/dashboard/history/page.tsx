@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { EventsProvider } from "~/context/events-context";
 import { HistoryEventFiltersProvider } from "~/context/history-event-filters-context";
@@ -32,7 +32,7 @@ export default async function History(props: {
 
   const { data: selectedVehicle } = await getCurrentSelectedVehicle();
 
-  if (!selectedVehicle) return notFound();
+  if (!selectedVehicle) return redirect("/dashboard/add-vehicle");
 
   const { data: historyEvents } = await getVehicleHistoryEvents(
     selectedVehicle.id,
