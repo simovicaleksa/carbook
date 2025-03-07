@@ -1,10 +1,10 @@
 import { eq, or } from "drizzle-orm";
 import { type z } from "zod";
 
-import { type signupSchema } from "~/app/auth/signup/validators";
-
 import { db } from "~/db";
 import { userProfileTable, userTable } from "~/db/_schema";
+
+import { type signupSchema } from "../validators/signup";
 
 import { hashPassword } from "./password";
 import { lower } from "./sql";
