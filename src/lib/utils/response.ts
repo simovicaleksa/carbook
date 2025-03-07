@@ -21,28 +21,28 @@ export function responseError(error: unknown): ErrorResponseType {
     return {
       ok: false,
       status: 401,
-      error: "Unauthorized",
+      error: error.message ?? "Unauthorized",
     };
   }
   if (error instanceof ZodError) {
     return {
       ok: false,
       status: 400,
-      error: "Invalid input",
+      error: error.errors[0]?.message ?? "Invalid data",
     };
   }
   if (error instanceof NotFoundError) {
     return {
       ok: false,
       status: 404,
-      error: "Resource not found",
+      error: error.message ?? "Resource not found",
     };
   }
   if (error instanceof UserInputError) {
     return {
       ok: false,
       status: 400,
-      error: error.message,
+      error: error.message ?? "Invalid user input",
     };
   }
   return {
