@@ -40,7 +40,6 @@ export default function EditHistoryEventForm() {
 
   function onEventUpdate(updatedEvent: EventType) {
     router.refresh();
-
     setIsOpen(false);
 
     if (!updatedEvent) setInspectDialogIsOpen(false);

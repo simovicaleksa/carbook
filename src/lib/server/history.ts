@@ -36,6 +36,9 @@ export async function getHistoryEvents(
   filterType?: string,
   search?: string,
 ) {
+  "use cache";
+  cacheTag(`vehicle-${vehicleId}-events`);
+
   const filters = filterType
     ? (decodeURIComponent(filterType)
         .split(",")
@@ -73,6 +76,9 @@ export async function getHistoryEventsCount(
   filterType?: string,
   search?: string,
 ) {
+  "use cache";
+  cacheTag(`vehicle-${vehicleId}-events`);
+
   const filters = filterType
     ? (decodeURIComponent(filterType)
         .split(",")
@@ -92,8 +98,6 @@ export async function getHistoryEventsCount(
   );
 
   return await db.$count(historyTable, where);
-
-  // return await db.$count(historyTable, eq(historyTable.vehicleId, vehicleId));
 }
 
 export async function updateHistoryEvent(
@@ -132,6 +136,7 @@ export async function deleteHistoryEvent(eventId: number) {
 export async function getLatestHistoryEvent(vehicleId: string) {
   "use cache";
   cacheTag(`vehicle-${vehicleId}-latest-event`);
+
   const event = await db.query.historyTable.findFirst({
     where: eq(historyTable.vehicleId, vehicleId),
     orderBy: desc(historyTable.atDistanceTraveled),

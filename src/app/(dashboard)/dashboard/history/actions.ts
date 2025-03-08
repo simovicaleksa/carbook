@@ -240,7 +240,10 @@ export async function updateVehicleHistoryEvent(
 
     const currency = await getUserCurrency(user.id);
     await updatePaymentForHistoryEvent(eventId, newEvent.cost, currency);
-    const updatedEvent = await updateHistoryEvent(eventId, newEvent);
+    const updatedEvent = await updateHistoryEvent(eventId, {
+      ...newEvent,
+      vehicleId: event.vehicleId,
+    });
 
     return responseSuccess(updatedEvent);
   } catch (error) {
