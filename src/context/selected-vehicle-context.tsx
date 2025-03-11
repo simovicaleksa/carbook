@@ -13,7 +13,7 @@ import {
 
 import { type InferSelectModel } from "drizzle-orm";
 
-import { updateUserSelectedVehicle } from "~/app/(dashboard)/dashboard/actions";
+import { serverUpdateUserSelectedVehicle } from "~/app/_actions/user";
 
 import { type vehicleTable } from "~/db/_schema";
 
@@ -52,7 +52,7 @@ export function SelectedVehicleProvider({
 
   async function changeSelectedVehicle(newSelectedVehicle: VehicleType) {
     loading.start();
-    const res = await updateUserSelectedVehicle(newSelectedVehicle.id);
+    const res = await serverUpdateUserSelectedVehicle(newSelectedVehicle.id);
     if (res.ok) {
       setSelectedVehicle(newSelectedVehicle);
       router.refresh();

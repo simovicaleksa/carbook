@@ -4,18 +4,17 @@ import { type z } from "zod";
 import { db } from "~/db";
 import { userProfileTable, userTable } from "~/db/_schema";
 
+import { hashPassword } from "../utils/password";
+import { lower } from "../utils/sql";
 import { type signupSchema } from "../validators/signup";
 
-import { hashPassword } from "./password";
-import { lower } from "./sql";
-
-export async function createUser(user: z.infer<typeof signupSchema>) {
-  const isEmailAvailable = await checkEmailAvailability(user.email);
+export async function dbCreateUser(user: z.infer<typeof signupSchema>) {
+  const isEmailAvailable = await dbCheckEmailAvailability(user.email);
   if (!isEmailAvailable) {
     throw new Error("Email is already in use");
   }
 
-  const isUsernameAvailable = await checkUsernameAvailability(user.username);
+  const isUsernameAvailable = await dbCheckUsernameAvailability(user.username);
   if (!isUsernameAvailable) {
     throw new Error("Username is already in use");
   }
@@ -39,7 +38,7 @@ export async function createUser(user: z.infer<typeof signupSchema>) {
   return dbUser;
 }
 
-export async function checkEmailAvailability(email: string) {
+export async function dbCheckEmailAvailability(email: string) {
   const users = await db
     .select({
       id: userTable.id,
@@ -54,7 +53,7 @@ export async function checkEmailAvailability(email: string) {
   return true;
 }
 
-export async function checkUsernameAvailability(username: string) {
+export async function dbCheckUsernameAvailability(username: string) {
   const users = await db
     .select({
       id: userTable.id,
@@ -69,7 +68,7 @@ export async function checkUsernameAvailability(username: string) {
   return true;
 }
 
-export async function getUserFromUsernameOrEmail(username: string) {
+export async function dbGetUserFromUsernameOrEmail(username: string) {
   const lowerCaseUsername = username.toLowerCase();
 
   const [user] = await db
@@ -85,7 +84,7 @@ export async function getUserFromUsernameOrEmail(username: string) {
   return user;
 }
 
-export async function getUserProfileFromUserId(userId: string) {
+export async function dbGetUserProfileFromUserId(userId: string) {
   const user = await db.query.userProfileTable.findFirst({
     where: eq(userProfileTable.userId, userId),
   });

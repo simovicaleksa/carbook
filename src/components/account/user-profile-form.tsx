@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { type z } from "zod";
 
-import { updateUserProfile } from "~/app/(dashboard)/dashboard/actions";
+import { serverUpdateUserProfile } from "~/app/_actions/user";
 
 import { cn } from "~/lib/utils";
 import { userProfileSchema } from "~/lib/validators/user-profile";
@@ -55,7 +55,7 @@ export default function UserProfileForm() {
   async function onSubmit(values: z.infer<typeof userProfileSchema>) {
     loading.start();
 
-    const res = await updateUserProfile(user.id, values);
+    const res = await serverUpdateUserProfile(user.id, values);
 
     if (!res.ok) {
       toast.error("Error", {

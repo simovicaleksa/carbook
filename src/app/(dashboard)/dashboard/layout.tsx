@@ -15,10 +15,10 @@ import { SidebarProvider } from "~/components/ui/sidebar";
 import { Toaster } from "~/components/ui/sonner";
 
 import {
-  getUserProfile,
-  getUserSelectedVehicle,
-  getUserVehicles,
-} from "./actions";
+  serverGetUserProfileFromUserId,
+  serverGetSelectedVehicleFromUserId,
+  serverGetUserVehicles,
+} from "../../_actions/user";
 
 export default async function DashboardLayout({
   children,
@@ -31,9 +31,11 @@ export default async function DashboardLayout({
     return redirect("/auth/login");
   }
 
-  const { data: vehicles } = await getUserVehicles();
-  const { data: selectedVehicle } = await getUserSelectedVehicle(user.id);
-  const { data: userProfile } = await getUserProfile(user.id);
+  const { data: vehicles } = await serverGetUserVehicles();
+  const { data: selectedVehicle } = await serverGetSelectedVehicleFromUserId(
+    user.id,
+  );
+  const { data: userProfile } = await serverGetUserProfileFromUserId(user.id);
 
   if (!userProfile) {
     return redirect("/auth/login");

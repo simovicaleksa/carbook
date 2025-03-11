@@ -7,28 +7,28 @@ import { db } from "~/db";
 import { userProfileTable } from "~/db/_schema";
 
 import { authorize } from "~/lib/server/authorize";
-import { getLatestHistoryEvent } from "~/lib/server/history";
+import { dbGetLatestHistoryEvent } from "~/lib/server/history";
 import {
-  getUserProfileFromUserId,
-  updateUserProfileFromUserId,
-  updateUserProfileSelectedVehicle,
+  dbGetUserProfileFromUserId,
+  dbUpdateUserProfileFromUserId,
+  dbUpdateUserProfileSelectedVehicle,
 } from "~/lib/server/user-profile";
 import {
-  createVehicle,
-  getVehicleFromId,
-  getVehiclesFromUserId,
-  updateVehicle,
+  dbCreateVehicle,
+  dbGetVehicleFromId,
+  dbGetVehiclesFromUserId,
+  dbUpdateVehicle,
 } from "~/lib/server/vehicle";
 import { NotFoundError, UserInputError } from "~/lib/utils/error";
 import { responseError, responseSuccess } from "~/lib/utils/response";
 import { userProfileSchema } from "~/lib/validators/user-profile";
 import { addVehicleSchema } from "~/lib/validators/vehicle";
 
-export async function getUserVehicles() {
+export async function serverGetUserVehicles() {
   try {
     const user = await authorize();
 
-    const userVehicles = await getVehiclesFromUserId(user.id);
+    const userVehicles = await dbGetVehiclesFromUserId(user.id);
 
     return responseSuccess(userVehicles);
   } catch (error) {
@@ -36,7 +36,7 @@ export async function getUserVehicles() {
   }
 }
 
-export async function createUserVehicle(
+export async function serverCreateUserVehicle(
   newVehicle: z.infer<typeof addVehicleSchema>,
 ) {
   try {
@@ -44,16 +44,16 @@ export async function createUserVehicle(
 
     const user = await authorize();
 
-    const vehicle = await createVehicle(user.id, newVehicle);
+    const vehicle = await dbCreateVehicle(user.id, newVehicle);
 
-    const userProfile = await getUserProfileFromUserId(user.id);
+    const userProfile = await dbGetUserProfileFromUserId(user.id);
 
     if (!userProfile) {
       throw new Error("User profile not found");
     }
 
     if (!userProfile.selectedVehicle) {
-      await updateUserProfileSelectedVehicle(user.id, vehicle.id);
+      await dbUpdateUserProfileSelectedVehicle(user.id, vehicle.id);
     }
 
     await db
@@ -69,9 +69,9 @@ export async function createUserVehicle(
   }
 }
 
-export async function selectUserVehicle(vehicleId: string) {
+export async function serverSelectUserVehicle(vehicleId: string) {
   try {
-    const vehicle = await getVehicleFromId(vehicleId);
+    const vehicle = await dbGetVehicleFromId(vehicleId);
 
     if (!vehicle) throw new NotFoundError("Vehicle not found");
 
@@ -92,7 +92,7 @@ export async function selectUserVehicle(vehicleId: string) {
   }
 }
 
-export async function getCurrentSelectedVehicle() {
+export async function serverGetUserSelectedVehicle() {
   try {
     const user = await authorize();
 
@@ -109,7 +109,7 @@ export async function getCurrentSelectedVehicle() {
   }
 }
 
-export async function getUserSelectedVehicle(userId: string) {
+export async function serverGetSelectedVehicleFromUserId(userId: string) {
   try {
     await authorize((user) => user.id == userId);
 
@@ -126,15 +126,15 @@ export async function getUserSelectedVehicle(userId: string) {
   }
 }
 
-export async function updateUserSelectedVehicle(vehicleId: string) {
+export async function serverUpdateUserSelectedVehicle(vehicleId: string) {
   try {
-    const vehicle = await getVehicleFromId(vehicleId);
+    const vehicle = await dbGetVehicleFromId(vehicleId);
 
     if (!vehicle) throw new NotFoundError("Vehicle not found");
 
     const user = await authorize((user) => vehicle.ownerId === user.id);
 
-    await updateUserProfileSelectedVehicle(user.id, vehicleId);
+    await dbUpdateUserProfileSelectedVehicle(user.id, vehicleId);
 
     return responseSuccess();
   } catch (error) {
@@ -142,20 +142,20 @@ export async function updateUserSelectedVehicle(vehicleId: string) {
   }
 }
 
-export async function updateUserVehicle(
+export async function serverUpdateUserVehicle(
   vehicleId: string,
   newVehicle: z.infer<typeof addVehicleSchema>,
 ) {
   try {
     addVehicleSchema.parse(newVehicle);
 
-    const vehicle = await getVehicleFromId(vehicleId);
+    const vehicle = await dbGetVehicleFromId(vehicleId);
 
     if (!vehicle) throw new NotFoundError("Vehicle not found");
 
     await authorize((user) => vehicle.ownerId === user.id);
 
-    const latestEvent = await getLatestHistoryEvent(vehicleId);
+    const latestEvent = await dbGetLatestHistoryEvent(vehicleId);
 
     if (
       latestEvent &&
@@ -166,7 +166,7 @@ export async function updateUserVehicle(
       );
     }
 
-    await updateVehicle(vehicleId, newVehicle);
+    await dbUpdateVehicle(vehicleId, newVehicle);
 
     return responseSuccess();
   } catch (error) {
@@ -174,13 +174,13 @@ export async function updateUserVehicle(
   }
 }
 
-export async function getUserProfile(userId: string) {
+export async function serverGetUserProfileFromUserId(userId: string) {
   try {
     await authorize(async (user) => {
       return user.id === userId;
     });
 
-    const userProfile = await getUserProfileFromUserId(userId);
+    const userProfile = await dbGetUserProfileFromUserId(userId);
 
     return responseSuccess(userProfile);
   } catch (error) {
@@ -188,7 +188,7 @@ export async function getUserProfile(userId: string) {
   }
 }
 
-export async function updateUserProfile(
+export async function serverUpdateUserProfile(
   userId: string,
   newUserProfile: z.infer<typeof userProfileSchema>,
 ) {
@@ -199,7 +199,7 @@ export async function updateUserProfile(
 
     userProfileSchema.parse(newUserProfile);
 
-    await updateUserProfileFromUserId(userId, newUserProfile);
+    await dbUpdateUserProfileFromUserId(userId, newUserProfile);
 
     return responseSuccess();
   } catch (error) {

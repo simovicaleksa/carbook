@@ -6,7 +6,7 @@ import { useState } from "react";
 
 import { toast } from "sonner";
 
-import { deleteVehicleHistoryEvent } from "~/app/(dashboard)/dashboard/history/actions";
+import { serverDeleteHistoryEvent } from "~/app/_actions/history";
 
 import { useDeleteEventDialog } from "~/context/delete-event-dialog-context";
 import { useEditHistoryDialog } from "~/context/edit-history-dialog-context";
@@ -57,7 +57,7 @@ export default function DeleteEventDialog() {
 
     loading.start();
 
-    const res = await deleteVehicleHistoryEvent(event.id);
+    const res = await serverDeleteHistoryEvent(event.id);
 
     if (!res.ok) {
       toast.error("Error", {

@@ -9,7 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { type z } from "zod";
 
-import { updateUserVehicle } from "~/app/(dashboard)/dashboard/actions";
+import { serverUpdateUserVehicle } from "~/app/_actions/user";
 
 import { cn } from "~/lib/utils";
 import { addVehicleSchema } from "~/lib/validators/vehicle";
@@ -77,7 +77,7 @@ export default function CarInformationForm() {
     if (!selectedVehicle) return;
     loading.start();
 
-    const res = await updateUserVehicle(selectedVehicle.id, values);
+    const res = await serverUpdateUserVehicle(selectedVehicle.id, values);
 
     if (!res.ok) {
       toast.error("Error", {

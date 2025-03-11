@@ -10,7 +10,7 @@ import { type addHistoryEventSchema } from "~/lib/validators/history";
 
 import { type HistoryEntryType } from "~/types/history";
 
-export async function createHistoryEvent(
+export async function dbCreateHistoryEvent(
   vehicleId: string,
   newEvent: Zod.infer<typeof addHistoryEventSchema>,
 ) {
@@ -28,7 +28,7 @@ export async function createHistoryEvent(
   return insertedEvent;
 }
 
-export async function getHistoryEvents(
+export async function dbGetHistoryEvents(
   vehicleId: string,
   page = 1,
   perPage = 10,
@@ -71,7 +71,7 @@ export async function getHistoryEvents(
   });
 }
 
-export async function getHistoryEventsCount(
+export async function dbGetHistoryEventsCount(
   vehicleId: string,
   filterType?: string,
   search?: string,
@@ -100,7 +100,7 @@ export async function getHistoryEventsCount(
   return await db.$count(historyTable, where);
 }
 
-export async function updateHistoryEvent(
+export async function dbUpdateHistoryEvent(
   eventId: number,
   event: Partial<typeof historyTable.$inferInsert>,
 ) {
@@ -119,7 +119,7 @@ export async function updateHistoryEvent(
   return updatedEvent;
 }
 
-export async function deleteHistoryEvent(eventId: number) {
+export async function dbDeleteHistoryEvent(eventId: number) {
   const [deletedEvent] = await db
     .delete(historyTable)
     .where(eq(historyTable.id, eventId))
@@ -133,7 +133,7 @@ export async function deleteHistoryEvent(eventId: number) {
   return deletedEvent;
 }
 
-export async function getLatestHistoryEvent(vehicleId: string) {
+export async function dbGetLatestHistoryEvent(vehicleId: string) {
   "use cache";
   cacheTag(`vehicle-${vehicleId}-latest-event`);
 

@@ -9,7 +9,7 @@ import { vehicleTable } from "~/db/_schema";
 
 import { type addVehicleSchema } from "~/lib/validators/vehicle";
 
-export async function getVehicleFromId(vehicleId: string) {
+export async function dbGetVehicleFromId(vehicleId: string) {
   "use cache";
   cacheTag(`vehicle-${vehicleId}`);
 
@@ -21,7 +21,7 @@ export async function getVehicleFromId(vehicleId: string) {
   return vehicle;
 }
 
-export async function getVehiclesFromUserId(userId: string) {
+export async function dbGetVehiclesFromUserId(userId: string) {
   "use cache";
   cacheTag(`user-${userId}-vehicles`);
 
@@ -31,7 +31,7 @@ export async function getVehiclesFromUserId(userId: string) {
     .where(eq(vehicleTable.ownerId, userId));
 }
 
-export async function createVehicle(
+export async function dbCreateVehicle(
   userId: string,
   {
     make,
@@ -62,11 +62,11 @@ export async function createVehicle(
   return vehicle;
 }
 
-export async function updateVehicle(
+export async function dbUpdateVehicle(
   vehicleId: string,
   newVehicle: Partial<z.infer<typeof addVehicleSchema>>,
 ) {
-  const vehicle = await getVehicleFromId(vehicleId);
+  const vehicle = await dbGetVehicleFromId(vehicleId);
 
   if (!vehicle) {
     throw new Error("Vehicle not found");
@@ -80,7 +80,7 @@ export async function updateVehicle(
   revalidateTag(`vehicle-${vehicleId}`);
 }
 
-export async function deleteVehicle(vehicleId: string) {
+export async function dbDeleteVehicle(vehicleId: string) {
   await db.delete(vehicleTable).where(eq(vehicleTable.id, vehicleId));
   revalidateTag(`vehicle-${vehicleId}`);
 }

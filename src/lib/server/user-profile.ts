@@ -6,7 +6,7 @@ import { eq, type InferSelectModel } from "drizzle-orm";
 import { db } from "~/db";
 import { userProfileTable } from "~/db/_schema";
 
-export async function getUserProfileFromUserId(userId: string) {
+export async function dbGetUserProfileFromUserId(userId: string) {
   "use cache";
   cacheTag(`user-profile-${userId}`);
 
@@ -24,7 +24,7 @@ export async function getUserProfileFromUserId(userId: string) {
   return userProfile;
 }
 
-export async function updateUserProfileSelectedVehicle(
+export async function dbUpdateUserProfileSelectedVehicle(
   userId: string,
   vehicleId: string,
 ) {
@@ -38,7 +38,7 @@ export async function updateUserProfileSelectedVehicle(
   revalidateTag(`user-profile-${userId}`);
 }
 
-export async function updateUserProfileFromUserId(
+export async function dbUpdateUserProfileFromUserId(
   userId: string,
   newUserProfile: Partial<InferSelectModel<typeof userProfileTable>>,
 ) {
@@ -50,25 +50,25 @@ export async function updateUserProfileFromUserId(
   revalidateTag(`user-profile-${userId}`);
 }
 
-export async function getUserCurrency(userId: string) {
+export async function dbGetUserCurrency(userId: string) {
   "use cache";
   cacheTag(`user-profile-${userId}`);
 
-  const userProfile = await getUserProfileFromUserId(userId);
+  const userProfile = await dbGetUserProfileFromUserId(userId);
 
   return userProfile.preferredCurrency ?? "USD";
 }
 
-export async function getUserUnits(userId: string) {
+export async function dbGetUserUnits(userId: string) {
   "use cache";
   cacheTag(`user-profile-${userId}`);
 
-  const userProfile = await getUserProfileFromUserId(userId);
+  const userProfile = await dbGetUserProfileFromUserId(userId);
 
   return userProfile.preferredUnits ?? "metric";
 }
 
-export async function getSelectedVehicleFromUserId(userId: string) {
+export async function dbGetSelectedVehicleFromUserId(userId: string) {
   "use cache";
   cacheTag(`user-profile-${userId}`);
 

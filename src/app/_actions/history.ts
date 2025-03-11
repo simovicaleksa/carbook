@@ -8,25 +8,22 @@ import { historyTable, vehicleTable } from "~/db/_schema";
 
 import { authorize } from "~/lib/server/authorize";
 import {
-  createHistoryEvent,
-  deleteHistoryEvent,
-  getHistoryEvents,
-  getHistoryEventsCount,
-  getLatestHistoryEvent,
-  updateHistoryEvent,
+  dbCreateHistoryEvent,
+  dbDeleteHistoryEvent,
+  dbGetHistoryEvents,
+  dbGetHistoryEventsCount,
+  dbGetLatestHistoryEvent,
+  dbUpdateHistoryEvent,
 } from "~/lib/server/history";
-import {
-  createPaymentForHistoryEvent,
-  updatePaymentForHistoryEvent,
-} from "~/lib/server/money";
-import { getUserCurrency, getUserUnits } from "~/lib/server/user-profile";
-import { updateVehicle } from "~/lib/server/vehicle";
+import { dbCreateEventPayment, dbUpdateEventPayment } from "~/lib/server/money";
+import { dbGetUserCurrency, dbGetUserUnits } from "~/lib/server/user-profile";
+import { dbUpdateVehicle } from "~/lib/server/vehicle";
 import { NotFoundError, UserInputError } from "~/lib/utils/error";
 import { responseError, responseSuccess } from "~/lib/utils/response";
 import { convertToMetric } from "~/lib/utils/units";
 import { addHistoryEventSchema } from "~/lib/validators/history";
 
-export async function createUserHistoryEvent(
+export async function serverCreateHistoryEvent(
   vehicleId: string,
   newEvent: z.infer<typeof addHistoryEventSchema>,
 ) {
@@ -46,7 +43,7 @@ export async function createUserHistoryEvent(
 
     addHistoryEventSchema.parse(newEvent);
 
-    const units = await getUserUnits(user.id);
+    const units = await dbGetUserUnits(user.id);
     const newAtDistanceTraveled = convertToMetric(
       newEvent.atDistanceTraveled,
       units,
@@ -108,15 +105,15 @@ export async function createUserHistoryEvent(
         .where(eq(vehicleTable.id, vehicleId));
     }
 
-    const addedEvent = await createHistoryEvent(vehicleId, {
+    const addedEvent = await dbCreateHistoryEvent(vehicleId, {
       ...newEvent,
       atDistanceTraveled: newAtDistanceTraveled,
     });
 
     if (!addedEvent) throw new Error("Failed to create event");
-    const currency = await getUserCurrency(user.id);
+    const currency = await dbGetUserCurrency(user.id);
 
-    await createPaymentForHistoryEvent(addedEvent.id, newEvent.cost, currency);
+    await dbCreateEventPayment(addedEvent.id, newEvent.cost, currency);
 
     return responseSuccess();
   } catch (error) {
@@ -124,7 +121,7 @@ export async function createUserHistoryEvent(
   }
 }
 
-export async function getVehicleHistoryEvents(
+export async function serverGetHistoryEventsPage(
   vehicleId: string,
   page = 1,
   perPage = 10,
@@ -143,7 +140,7 @@ export async function getVehicleHistoryEvents(
       return true;
     });
 
-    const events = await getHistoryEvents(
+    const events = await dbGetHistoryEvents(
       vehicleId,
       page,
       perPage,
@@ -152,7 +149,7 @@ export async function getVehicleHistoryEvents(
       search,
     );
 
-    const total = await getHistoryEventsCount(vehicleId, filters, search);
+    const total = await dbGetHistoryEventsCount(vehicleId, filters, search);
 
     const responseObject = {
       events,
@@ -186,7 +183,7 @@ export async function updateVehicleHistoryEvent(
       return true;
     });
 
-    const units = await getUserUnits(user.id);
+    const units = await dbGetUserUnits(user.id);
     const newAtDistanceTraveled = convertToMetric(
       newEvent.atDistanceTraveled,
       units,
@@ -230,17 +227,17 @@ export async function updateVehicleHistoryEvent(
       );
     }
 
-    const latestEvent = await getLatestHistoryEvent(event.vehicleId);
+    const latestEvent = await dbGetLatestHistoryEvent(event.vehicleId);
 
     if (latestEvent && latestEvent.atDistanceTraveled < newAtDistanceTraveled) {
-      await updateVehicle(event.vehicleId, {
+      await dbUpdateVehicle(event.vehicleId, {
         distanceTraveled: newAtDistanceTraveled,
       });
     }
 
-    const currency = await getUserCurrency(user.id);
-    await updatePaymentForHistoryEvent(eventId, newEvent.cost, currency);
-    const updatedEvent = await updateHistoryEvent(eventId, {
+    const currency = await dbGetUserCurrency(user.id);
+    await dbUpdateEventPayment(eventId, newEvent.cost, currency);
+    const updatedEvent = await dbUpdateHistoryEvent(eventId, {
       ...newEvent,
       vehicleId: event.vehicleId,
     });
@@ -251,7 +248,7 @@ export async function updateVehicleHistoryEvent(
   }
 }
 
-export async function deleteVehicleHistoryEvent(eventId: number) {
+export async function serverDeleteHistoryEvent(eventId: number) {
   try {
     await authorize(async (user) => {
       const event = await db.query.historyTable.findFirst({
@@ -266,7 +263,7 @@ export async function deleteVehicleHistoryEvent(eventId: number) {
       return true;
     });
 
-    await deleteHistoryEvent(eventId);
+    await dbDeleteHistoryEvent(eventId);
 
     return responseSuccess();
   } catch (error) {

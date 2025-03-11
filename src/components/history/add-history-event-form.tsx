@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { type z } from "zod";
 
-import { createUserHistoryEvent } from "~/app/(dashboard)/dashboard/history/actions";
+import { serverCreateHistoryEvent } from "~/app/_actions/history";
 
 import { cn } from "~/lib/utils";
 import { addHistoryEventSchema } from "~/lib/validators/history";
@@ -38,7 +38,7 @@ export default function AddHistoryEventForm() {
 
     loading.start();
 
-    const res = await createUserHistoryEvent(selectedVehicle.id, values);
+    const res = await serverCreateHistoryEvent(selectedVehicle.id, values);
 
     if (!res.ok) {
       toast.error("Error", {

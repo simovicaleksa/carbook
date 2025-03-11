@@ -8,7 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { type z } from "zod";
 
-import { login } from "~/app/(dashboard)/auth/login/actions";
+import { login } from "~/app/_actions/auth";
 
 import { loginSchema } from "~/lib/validators/login";
 

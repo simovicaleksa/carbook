@@ -14,9 +14,8 @@ import AddHistoryEventHeaderButton from "~/components/history/add-history-event-
 import HistoryFilters from "~/components/history/history-filters";
 import Timeline from "~/components/history/timeline";
 
-import { getCurrentSelectedVehicle } from "../actions";
-
-import { getVehicleHistoryEvents } from "./actions";
+import { serverGetHistoryEventsPage } from "../../../_actions/history";
+import { serverGetUserSelectedVehicle } from "../../../_actions/user";
 
 const PER_PAGE = 10;
 
@@ -30,11 +29,11 @@ export default async function History(props: {
 }) {
   const searchParams = await props.searchParams;
 
-  const { data: selectedVehicle } = await getCurrentSelectedVehicle();
+  const { data: selectedVehicle } = await serverGetUserSelectedVehicle();
 
   if (!selectedVehicle) return redirect("/dashboard/add-vehicle");
 
-  const { data: historyEvents } = await getVehicleHistoryEvents(
+  const { data: historyEvents } = await serverGetHistoryEventsPage(
     selectedVehicle.id,
     searchParams?.page ?? 1,
     PER_PAGE,

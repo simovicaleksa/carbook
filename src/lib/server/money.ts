@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { db } from "~/db";
 import { moneyTable } from "~/db/_schema";
 
-export async function createPaymentForHistoryEvent(
+export async function dbCreateEventPayment(
   eventId: number,
   amount: number,
   currency: string,
@@ -15,7 +15,7 @@ export async function createPaymentForHistoryEvent(
   });
 }
 
-export async function updatePaymentForHistoryEvent(
+export async function dbUpdateEventPayment(
   eventId: number,
   amount: number,
   currency: string,
