@@ -35,7 +35,6 @@ const coreItems = [
     title: "Statistics",
     url: "/dashboard/statistics",
     icon: <ChartLine />,
-    comingSoon: true,
   },
   {
     title: "Upcoming",
