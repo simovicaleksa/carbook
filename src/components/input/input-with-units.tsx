@@ -25,7 +25,7 @@ export default function InputWithUnits({
       {units && (
         <span
           ref={unitsRef}
-          className="absolute right-0 ml-2 flex h-full w-fit items-center justify-center bg-secondary px-3 text-sm text-muted-foreground"
+          className="absolute right-0 ml-2 flex h-full w-fit items-center justify-center border bg-secondary px-3 text-sm text-muted-foreground"
         >
           {getUnits(units)}
         </span>
