@@ -58,7 +58,9 @@ export async function dbGetHistoryEvents(
   );
 
   const orderBy =
-    sortBy === "oldest" ? asc(historyTable.date) : desc(historyTable.date);
+    sortBy === "oldest"
+      ? [asc(historyTable.atDistanceTraveled), asc(historyTable.date)]
+      : [desc(historyTable.atDistanceTraveled), desc(historyTable.date)];
 
   return await db.query.historyTable.findMany({
     where,
