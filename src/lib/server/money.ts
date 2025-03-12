@@ -1,7 +1,9 @@
+import { cacheTag } from "next/dist/server/use-cache/cache-tag";
+
 import { eq } from "drizzle-orm";
 
 import { db } from "~/db";
-import { moneyTable } from "~/db/_schema";
+import { historyTable, moneyTable } from "~/db/_schema";
 
 export async function dbCreateEventPayment(
   eventId: number,
@@ -27,4 +29,26 @@ export async function dbUpdateEventPayment(
       currency,
     })
     .where(eq(moneyTable.historyEntryId, eventId));
+}
+
+export async function dbGetVehicleTransactions(vehicleId: string) {
+  "use cache";
+  cacheTag(`vehicle-${vehicleId}-events`);
+
+  const eventsWithTransactions = await db.query.historyTable.findMany({
+    where: eq(historyTable.vehicleId, vehicleId),
+    columns: {
+      type: true,
+    },
+    with: {
+      cost: {
+        columns: {
+          currency: true,
+          amount: true,
+        },
+      },
+    },
+  });
+
+  return eventsWithTransactions;
 }
