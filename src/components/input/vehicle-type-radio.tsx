@@ -10,25 +10,25 @@ const options = [
     value: "motorcycle",
     label: "Motorcycle",
     icon: <Bike className="mb-2.5 text-muted-foreground" />,
-    description: "Two-wheeler",
+    // description: "Two-wheeler",
   },
   {
     value: "car",
     label: "Car",
     icon: <Car className="mb-2.5 text-muted-foreground" />,
-    description: "Passenger vehicle",
+    // description: "Passenger vehicle",
   },
   {
     value: "truck",
     label: "Truck",
     icon: <Truck className="mb-2.5 text-muted-foreground" />,
-    description: "Cargo hauler",
+    // description: "Cargo hauler",
   },
   {
     value: "van",
     label: "Van",
     icon: <Bus className="mb-2.5 text-muted-foreground" />,
-    description: "Multi-purpose",
+    // description: "Multi-purpose",
   },
 ];
 
@@ -54,7 +54,7 @@ export default function VehicleTypeRadio({
 
           {option.icon}
           <span className="font-semibold tracking-tight">{option.label}</span>
-          <p className="text-xs">{option.description}</p>
+          {/* <p className="text-xs">{option.description}</p> */}
         </RadioGroup.Item>
       ))}
     </RadioGroup.Root>
