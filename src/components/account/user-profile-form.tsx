@@ -71,7 +71,7 @@ export default function UserProfileForm() {
   }
 
   return (
-    <Card className="w-full max-w-3xl">
+    <Card className="w-full max-w-xl">
       <CardHeader>
         <CardTitle>User prefrences</CardTitle>
         <CardDescription>Update user preferences</CardDescription>
