@@ -1,6 +1,6 @@
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 import { db } from "~/db";
 import { historyTable } from "~/db/_schema";
@@ -84,7 +84,10 @@ export async function dbGetVehicleAccidents(vehicleId: string) {
   cacheTag(`vehicle-${vehicleId}-events`);
 
   const vehicleAccidents = await db.query.historyTable.findMany({
-    where: eq(historyTable.vehicleId, vehicleId),
+    where: and(
+      eq(historyTable.vehicleId, vehicleId),
+      eq(historyTable.type, "accident"),
+    ),
   });
 
   return vehicleAccidents;
