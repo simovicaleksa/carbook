@@ -4,6 +4,7 @@ import { authorize } from "~/lib/server/authorize";
 import {
   dbGetTotalVehicleSpendingGroupedByCurrency,
   dbGetTotalVehicleSpendingGroupedByType,
+  dbGetVehicleAccidents,
 } from "~/lib/server/statistics";
 import { dbGetVehicleFromId } from "~/lib/server/vehicle";
 import { responseError, responseSuccess } from "~/lib/utils/response";
@@ -45,6 +46,24 @@ export async function serverGetTotalVehicleSpendingGroupedByType(
       vehicleId,
       currency,
     );
+
+    return responseSuccess(data);
+  } catch (error) {
+    return responseError(error);
+  }
+}
+
+export async function serverGetVehicleAccidents(vehicleId: string) {
+  try {
+    await authorize(async (user) => {
+      const vehicle = await dbGetVehicleFromId(vehicleId);
+
+      if (!vehicle) return false;
+
+      return vehicle.ownerId === user.id;
+    });
+
+    const data = await dbGetVehicleAccidents(vehicleId);
 
     return responseSuccess(data);
   } catch (error) {

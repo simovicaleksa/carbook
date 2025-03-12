@@ -1,5 +1,10 @@
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
+import { eq } from "drizzle-orm";
+
+import { db } from "~/db";
+import { historyTable } from "~/db/_schema";
+
 import {
   type VehicleSpendingGroupedByType,
   type VehicleSpendingGroupedByCurrency,
@@ -72,4 +77,15 @@ export async function dbGetTotalVehicleSpendingGroupedByType(
   });
 
   return groupedByType;
+}
+
+export async function dbGetVehicleAccidents(vehicleId: string) {
+  "use cache";
+  cacheTag(`vehicle-${vehicleId}-events`);
+
+  const vehicleAccidents = await db.query.historyTable.findMany({
+    where: eq(historyTable.vehicleId, vehicleId),
+  });
+
+  return vehicleAccidents;
 }
