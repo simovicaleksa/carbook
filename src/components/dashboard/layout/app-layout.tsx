@@ -19,8 +19,16 @@ export function AppLayoutHeader({
   );
 }
 
-export function AppLayoutContent({ children }: { children?: React.ReactNode }) {
-  return <div className="min-h-[78vh] p-5 xl:p-10">{children}</div>;
+export function AppLayoutContent({
+  children,
+  className,
+}: {
+  children?: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={cn("min-h-[78vh] p-5 xl:p-10", className)}>{children}</div>
+  );
 }
 
 export function AppLayoutFooter({
