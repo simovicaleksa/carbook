@@ -1,6 +1,6 @@
 import { cacheTag } from "next/dist/server/use-cache/cache-tag";
 
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 
 import { db } from "~/db";
 import { historyTable } from "~/db/_schema";
@@ -88,6 +88,7 @@ export async function dbGetVehicleAccidents(vehicleId: string) {
       eq(historyTable.vehicleId, vehicleId),
       eq(historyTable.type, "accident"),
     ),
+    orderBy: asc(historyTable.date),
   });
 
   return vehicleAccidents;
