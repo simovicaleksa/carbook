@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { type z } from "zod";
 
-import { updateVehicleHistoryEvent } from "~/app/_actions/history";
+import { serverUpdateVehicleHistoryEvent } from "~/app/_actions/history";
 
 import { cn } from "~/lib/utils";
 import { addHistoryEventSchema } from "~/lib/validators/history";
@@ -51,7 +51,7 @@ export default function EditHistoryEventForm() {
 
     loading.start();
 
-    const res = await updateVehicleHistoryEvent(event.id, values);
+    const res = await serverUpdateVehicleHistoryEvent(event.id, values);
 
     if (!res.ok) {
       toast.error("Error", {
