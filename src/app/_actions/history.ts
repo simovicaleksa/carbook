@@ -28,13 +28,14 @@ export async function serverCreateHistoryEvent(
   newEvent: z.infer<typeof addHistoryEventSchema>,
 ) {
   try {
+    const vehicle = await db.query.vehicleTable.findFirst({
+      where: and(eq(vehicleTable.id, vehicleId)),
+    });
+
+    if (!vehicle) throw new NotFoundError("Vehicle not found");
+
     const user = await authorize(async (user) => {
-      const vehicle = await db.query.vehicleTable.findFirst({
-        where: and(
-          eq(vehicleTable.id, vehicleId),
-          eq(vehicleTable.ownerId, user.id),
-        ),
-      });
+      if (vehicle?.ownerId !== user.id) return false;
 
       if (!vehicle) return false;
 
@@ -48,6 +49,11 @@ export async function serverCreateHistoryEvent(
       newEvent.atDistanceTraveled,
       units,
     );
+
+    // check if the event is before vehicle manufacture date
+    if (newEvent.date.getFullYear() < vehicle.year) {
+      throw new UserInputError("Event date is before vehicle manufacture date");
+    }
 
     // Check for preceding events with higher distance traveled
     const precedingConflict = await db
@@ -162,7 +168,7 @@ export async function serverGetHistoryEventsPage(
   }
 }
 
-export async function updateVehicleHistoryEvent(
+export async function serverUpdateVehicleHistoryEvent(
   eventId: number,
   newEvent: z.infer<typeof addHistoryEventSchema>,
 ) {
@@ -188,6 +194,9 @@ export async function updateVehicleHistoryEvent(
       newEvent.atDistanceTraveled,
       units,
     );
+
+    if (newEvent.date.getFullYear() < event.vehicle.year)
+      throw new UserInputError("Event date is before vehicle manufacture date");
 
     // Check for preceding events with higher distance traveled
     const precedingConflict = await db
