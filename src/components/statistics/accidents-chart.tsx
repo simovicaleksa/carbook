@@ -65,7 +65,7 @@ function AccidentsChartInner() {
               : "No accidents"}
           </CardDescription>
         </div>
-        <ChartTimelineSelect />
+        <ChartTimelineSelect disabled={vehicleAccidents?.length === 0} />
       </CardHeader>
       <CardContent>
         {data.length ? (

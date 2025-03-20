@@ -14,7 +14,7 @@ import {
 
 const options = ["week", "month", "1yr", "5yr", "10yr", "all"] as const;
 
-export function ChartTimelineSelect() {
+export function ChartTimelineSelect({ disabled }: { disabled?: boolean }) {
   const { timeframe, setTimeframe } = useChart();
 
   return (
@@ -26,6 +26,7 @@ export function ChartTimelineSelect() {
             onClick={() => setTimeframe(option)}
             variant={timeframe === option ? "default" : "outline"}
             size={"sm"}
+            disabled={disabled}
           >
             {option}
           </Button>
