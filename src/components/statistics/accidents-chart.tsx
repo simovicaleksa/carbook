@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 
-import { CircleCheck, FlagOff } from "lucide-react";
+import { FlagOff } from "lucide-react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -53,20 +53,6 @@ function AccidentsChartInner() {
   }, [selectedVehicle?.year, vehicleAccidents, timeframe]);
 
   if (!selectedVehicle?.year) return null;
-
-  if (!vehicleAccidents?.length)
-    return (
-      <Card className="col-span-1 h-fit">
-        <CardHeader className="flex flex-row justify-between">
-          <div className="space-y-2">
-            <CardTitle>Accidents history</CardTitle>
-            <CardDescription>No accidents reported</CardDescription>
-          </div>
-
-          <CircleCheck className="size-8 text-green-500" />
-        </CardHeader>
-      </Card>
-    );
 
   return (
     <Card className="col-span-full h-fit">
