@@ -6,6 +6,11 @@ import {
   format,
   eachYearOfInterval,
   endOfYear,
+  eachDayOfInterval,
+  startOfMonth,
+  endOfMonth,
+  eachMonthOfInterval,
+  subDays,
 } from "date-fns";
 import { type InferSelectModel } from "drizzle-orm";
 
@@ -53,37 +58,106 @@ export function filterByTimeframe<T>(data: T[], timeframe: TimeframeType): T[] {
 export function fillAccidentsData(
   data: InferSelectModel<typeof historyTable>[],
   timeframe: TimeframeType,
-  startDate: Date,
+  startDate?: Date, // Optional, only used for "all"
 ): { x: string; y: number }[] {
-  const now = new Date();
+  const now = new Date(); // Current date (e.g., 2025-03-20)
   const countMap = new Map<string, number>();
 
+  // Count accidents based on timeframe
   data.forEach((item) => {
     let key: string;
-    if (["week", "month"].includes(timeframe)) {
-      key = format(item.date, "MMM d");
-    } else if (["1yr", "5yr", "10yr", "all"].includes(timeframe)) {
-      key = format(startOfYear(item.date), "yyyy");
-    } else {
-      return;
+    switch (timeframe) {
+      case "week":
+      case "month":
+        key = format(item.date, "MMM d"); // e.g., "Mar 20"
+        break;
+      case "1yr":
+        key = format(item.date, "MMM yyyy"); // e.g., "Mar 2025"
+        break;
+      case "5yr":
+      case "10yr":
+      case "all":
+        key = format(startOfYear(item.date), "yyyy"); // e.g., "2025"
+        break;
+      default:
+        return;
     }
     countMap.set(key, (countMap.get(key) ?? 0) + 1);
   });
 
-  if (timeframe !== "all") {
-    return Array.from(countMap.entries()).map(([x, y]) => ({ x, y }));
+  // Define the start date based on timeframe
+  let intervalStart: Date;
+  let intervalEnd = now; // End is today
+  let dateArray: Date[];
+
+  switch (timeframe) {
+    case "week":
+      intervalStart = subDays(now, 6); // 7 days total, including today
+      dateArray = eachDayOfInterval({ start: intervalStart, end: intervalEnd });
+      return dateArray.map((date) => {
+        const key = format(date, "MMM d");
+        return { x: key, y: countMap.get(key) ?? 0 };
+      });
+
+    case "month":
+      intervalStart = subMonths(now, 1); // 1 month ago from today
+      dateArray = eachDayOfInterval({ start: intervalStart, end: intervalEnd });
+      return dateArray.map((date) => {
+        const key = format(date, "MMM d");
+        return { x: key, y: countMap.get(key) ?? 0 };
+      });
+
+    case "1yr":
+      intervalStart = startOfMonth(subYears(now, 1)); // 1 year ago
+      intervalEnd = endOfMonth(now);
+      dateArray = eachMonthOfInterval({
+        start: intervalStart,
+        end: intervalEnd,
+      });
+      return dateArray.map((date) => {
+        const key = format(date, "MMM yyyy");
+        return { x: key, y: countMap.get(key) ?? 0 };
+      });
+
+    case "5yr":
+      intervalStart = startOfYear(subYears(now, 5)); // 5 years ago
+      intervalEnd = endOfYear(now);
+      dateArray = eachYearOfInterval({
+        start: intervalStart,
+        end: intervalEnd,
+      });
+      return dateArray.map((date) => {
+        const key = format(date, "yyyy");
+        return { x: key, y: countMap.get(key) ?? 0 };
+      });
+
+    case "10yr":
+      intervalStart = startOfYear(subYears(now, 10)); // 10 years ago
+      intervalEnd = endOfYear(now);
+      dateArray = eachYearOfInterval({
+        start: intervalStart,
+        end: intervalEnd,
+      });
+      return dateArray.map((date) => {
+        const key = format(date, "yyyy");
+        return { x: key, y: countMap.get(key) ?? 0 };
+      });
+
+    case "all":
+      if (!startDate)
+        throw new Error('startDate is required for "all" timeframe');
+      intervalStart = startOfYear(startDate);
+      intervalEnd = endOfYear(now);
+      dateArray = eachYearOfInterval({
+        start: intervalStart,
+        end: intervalEnd,
+      });
+      return dateArray.map((date) => {
+        const key = format(date, "yyyy");
+        return { x: key, y: countMap.get(key) ?? 0 };
+      });
+
+    default:
+      return [];
   }
-
-  const allYears = eachYearOfInterval({
-    start: startOfYear(startDate),
-    end: endOfYear(now),
-  });
-
-  return allYears.map((year) => {
-    const yearStr = format(year, "yyyy");
-    return {
-      x: yearStr,
-      y: countMap.get(yearStr) ?? 0,
-    };
-  });
 }
