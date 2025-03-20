@@ -1,3 +1,5 @@
+import { set } from "date-fns";
+
 export function convertToLocalDateString(
   date: Date,
   shortFormat = false,
@@ -11,4 +13,8 @@ export function convertToLocalDateString(
   };
 
   return localDate.toLocaleDateString("en-US", options);
+}
+
+export function getDateFromYear(year: number): Date {
+  return set(new Date(), { year, month: 0, date: 1 });
 }
