@@ -47,7 +47,6 @@ function AccidentsChartInner() {
       timeframe,
       getDateFromYear(selectedVehicle.year),
     );
-    console.log(filledData);
 
     return filledData;
   }, [selectedVehicle?.year, vehicleAccidents, timeframe]);
@@ -73,12 +72,20 @@ function AccidentsChartInner() {
             <BarChart width={300} height={400} data={data} className="!p-0">
               <CartesianGrid strokeDasharray={"3 3"} />
               <Tooltip
-                wrapperClassName="rounded-[var(--radius)]"
-                labelClassName="text-lg font-semibold"
+                wrapperClassName="rounded-[var(--radius)] text-sm"
+                labelClassName="text-lg font-semibold !text-foreground"
                 offset={30}
                 cursor={{
                   className: "fill-neutral-500/5 rounded-[var(--radius)]",
                 }}
+                labelFormatter={(label) => `${label}`}
+                formatter={(value) => [
+                  Number(value) === 0
+                    ? "No accidents"
+                    : Number(value) <= 1
+                      ? `${Number(value)} accident`
+                      : `${Number(value)} accidents`,
+                ]}
               />
               <XAxis
                 dataKey={"x"}
@@ -97,7 +104,7 @@ function AccidentsChartInner() {
               />
               <Bar
                 dataKey={"y"}
-                className="fill-red-500"
+                className="cursor-pointer fill-red-500"
                 radius={[5, 5, 0, 0]}
               />
             </BarChart>
