@@ -25,8 +25,8 @@ export default function AppPagination({ perPage = 10 }: { perPage?: number }) {
   const hasPrevious = page > 1;
   const hasNext = page < maxPage;
 
-  const previousPage = `${pathname}?${createQueryString("page", String(hasPrevious ? page - 1 : 1))}`;
-  const nextPage = `${pathname}?${createQueryString("page", String(hasNext ? page + 1 : maxPage))}`;
+  const previousPage = `${pathname}?${createQueryString({ page: hasPrevious ? page - 1 : 1 }, true)}`;
+  const nextPage = `${pathname}?${createQueryString({ page: hasNext ? page + 1 : maxPage }, true)}`;
 
   useEffect(() => {
     if (!page)

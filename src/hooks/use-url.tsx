@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 
 type RoutingBehavior = "push" | "replace";
+type ParamValue = string | number | boolean | string[] | null;
 
 export function useUrl() {
   const pathname = usePathname();
@@ -14,7 +15,6 @@ export function useUrl() {
   // Helper function to safely encode values
   const safeEncode = useCallback((value: string | null): string | null => {
     if (value === null) return null;
-
     // Check if the value is already encoded to prevent double-encoding
     try {
       // If decodeURIComponent succeeds without throwing, it's likely already encoded
@@ -26,26 +26,35 @@ export function useUrl() {
     }
   }, []);
 
+  // Helper to process any param value
+  const processParamValue = useCallback((value: ParamValue): string | null => {
+    if (value === null) return null;
+    if (Array.isArray(value)) {
+      // Join array values with comma
+      return value.join(",");
+    }
+    // Convert other types to string
+    return String(value);
+  }, []);
+
   const setParams = useCallback(
     (
-      updates: Record<string, string | null>,
+      updates: Record<string, ParamValue>,
       behavior: RoutingBehavior = "replace",
     ) => {
       const params = new URLSearchParams(searchParams.toString());
-
       // Apply all updates to the params with automatic encoding
       Object.entries(updates).forEach(([key, value]) => {
-        if (value === null) {
+        const processedValue = processParamValue(value);
+        if (processedValue === null) {
           params.delete(key);
         } else {
           // Use safeEncode to automatically handle URI encoding
-          params.set(key, safeEncode(value) ?? "");
+          params.set(key, safeEncode(processedValue) ?? "");
         }
       });
-
       // Construct the new URL
       const newUrl = `${pathname}?${params.toString()}`;
-
       // Use the specified routing behavior
       if (behavior === "push") {
         router.push(newUrl);
@@ -53,7 +62,7 @@ export function useUrl() {
         router.replace(newUrl);
       }
     },
-    [pathname, searchParams, router, safeEncode],
+    [pathname, searchParams, router, safeEncode, processParamValue],
   );
 
   const getParam = useCallback(
@@ -63,18 +72,28 @@ export function useUrl() {
     [searchParams],
   );
 
+  // Enhanced createQueryString with option to preserve current URL params
   const createQueryString = useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
-      if (value === null) {
-        params.delete(name);
-      } else {
-        // Automatically encode the value
-        params.set(name, safeEncode(value) ?? "");
-      }
-      return params.toString();
+    (params: Record<string, ParamValue>, preserveCurrentParams = false) => {
+      // Start with either current params (if preserving) or a fresh URLSearchParams
+      const urlParams = preserveCurrentParams
+        ? new URLSearchParams(searchParams.toString())
+        : new URLSearchParams();
+
+      // Apply all new params, overwriting existing ones if there's a conflict
+      Object.entries(params).forEach(([key, value]) => {
+        const processedValue = processParamValue(value);
+        if (processedValue === null) {
+          urlParams.delete(key);
+        } else {
+          // Use safeEncode to automatically handle URI encoding
+          urlParams.set(key, safeEncode(processedValue) ?? "");
+        }
+      });
+
+      return urlParams.toString();
     },
-    [searchParams, safeEncode],
+    [searchParams, safeEncode, processParamValue],
   );
 
   return {
