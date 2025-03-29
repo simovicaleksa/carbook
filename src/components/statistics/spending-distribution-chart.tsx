@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 
 import { useMemo } from "react";
 
+import { PenOff } from "lucide-react";
 import {
   ResponsiveContainer,
   PieChart,
@@ -29,6 +30,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
+import { NoResults } from "../ui/no-results";
 
 const COLORS = [
   "#1E40AF", // Blue-800
@@ -62,8 +64,6 @@ export default function SpendingDistributionChart() {
     return data.reduce((total, current) => total + current.total, 0);
   }, [data]);
 
-  if (!data) return null;
-
   function handleClickType(type: string) {
     const urlParams = createQueryString({
       page: 1,
@@ -82,74 +82,82 @@ export default function SpendingDistributionChart() {
         </div>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={400}>
-          <PieChart width={250} height={250}>
-            <Pie
-              labelLine={false}
-              data={data}
-              dataKey="total"
-              nameKey="type"
-              innerRadius={70} // Creates the hollow center
-              outerRadius={100}
-              fill="#8884d8"
-              paddingAngle={5}
-              offset={200}
-              label={({ type, total }) =>
-                isMobile
-                  ? null
-                  : `${capitalize(type)} (${formatPrice(Number(total), currency)})`
-              }
-            >
-              {data.map((entry, index) => (
-                <Cell
-                  key={index}
-                  fill={COLORS[index]}
-                  className="cursor-pointer"
-                  onClick={() => handleClickType(entry.type)}
-                />
-              ))}
-              <Label
-                content={({ viewBox }) => {
-                  if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                    return (
-                      <text
-                        x={viewBox.cx}
-                        y={viewBox.cy}
-                        textAnchor="middle"
-                        dominantBaseline="middle"
-                      >
-                        <tspan
+        {data ? (
+          <ResponsiveContainer width="100%" height={400}>
+            <PieChart width={250} height={250}>
+              <Pie
+                labelLine={false}
+                data={data}
+                dataKey="total"
+                nameKey="type"
+                innerRadius={70} // Creates the hollow center
+                outerRadius={100}
+                fill="#8884d8"
+                paddingAngle={5}
+                offset={200}
+                label={({ type, total }) =>
+                  isMobile
+                    ? null
+                    : `${capitalize(type)} (${formatPrice(Number(total), currency)})`
+                }
+              >
+                {data.map((entry, index) => (
+                  <Cell
+                    key={index}
+                    fill={COLORS[index]}
+                    className="cursor-pointer"
+                    onClick={() => handleClickType(entry.type)}
+                  />
+                ))}
+                <Label
+                  content={({ viewBox }) => {
+                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                      return (
+                        <text
                           x={viewBox.cx}
                           y={viewBox.cy}
-                          className="fill-foreground text-2xl font-bold"
+                          textAnchor="middle"
+                          dominantBaseline="middle"
                         >
-                          {formatPrice(totalSpent, currency)}
-                        </tspan>
-                        <tspan
-                          x={viewBox.cx}
-                          y={(viewBox.cy ?? 0) + 24}
-                          className="fill-muted-foreground"
-                        >
-                          Spent
-                        </tspan>
-                      </text>
-                    );
-                  }
-                }}
+                          <tspan
+                            x={viewBox.cx}
+                            y={viewBox.cy}
+                            className="fill-foreground text-2xl font-bold"
+                          >
+                            {formatPrice(totalSpent, currency)}
+                          </tspan>
+                          <tspan
+                            x={viewBox.cx}
+                            y={(viewBox.cy ?? 0) + 24}
+                            className="fill-muted-foreground"
+                          >
+                            Spent
+                          </tspan>
+                        </text>
+                      );
+                    }
+                  }}
+                />
+              </Pie>
+
+              <Tooltip
+                wrapperClassName="rounded-[var(--radius)] text-sm"
+                formatter={(value, name) => [
+                  formatPrice(Number(value), currency),
+                  `${String(name).charAt(0).toUpperCase()}${String(name).slice(1)}`,
+                ]}
               />
-            </Pie>
 
-            <Tooltip
-              wrapperClassName="rounded-[var(--radius)] text-sm"
-              formatter={(value, name) => [
-                formatPrice(Number(value), currency),
-                `${String(name).charAt(0).toUpperCase()}${String(name).slice(1)}`,
-              ]}
-            />
-
-            <Legend iconSize={20} />
-          </PieChart>
-        </ResponsiveContainer>
+              <Legend iconSize={20} />
+            </PieChart>
+          </ResponsiveContainer>
+        ) : (
+          <NoResults
+            icon={PenOff}
+            title="No spending"
+            description="You haven't recorded any spending yet"
+          />
+        )}
       </CardContent>
       <CardFooter></CardFooter>
     </Card>
