@@ -18,7 +18,7 @@ import {
 } from "~/components/dashboard/layout/app-layout";
 import CurrencySelectAction from "~/components/input/currency-select-action";
 import AccidentsChart from "~/components/statistics/accidents-chart";
-import VehicleStatistics from "~/components/statistics/vehicle-statistics";
+import SpendingDistributionChart from "~/components/statistics/spending-distribution-chart";
 
 export default async function StatisticsPage({
   searchParams,
@@ -50,6 +50,9 @@ export default async function StatisticsPage({
     vehicleSpendingGroupedByCurrency,
   );
 
+  if (!currency && currencies.length > 0)
+    redirect(`/dashboard/statistics?currency=${currencies[0]}`);
+
   return (
     <StatisticsProvider
       value={{
@@ -64,7 +67,7 @@ export default async function StatisticsPage({
           action={<CurrencySelectAction currencies={currencies} />}
         />
         <AppLayoutContent className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-          <VehicleStatistics />
+          <SpendingDistributionChart />
           <AccidentsChart />
         </AppLayoutContent>
       </AppLayout>
